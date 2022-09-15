@@ -64,7 +64,76 @@
 		
 
 
-<p>Hello world!</p>
+<p>Hi everyone! Welcome to the wild world that will be my Election Analytics blog. Before we get into the nitty gritty, allow me to introduce myself. I’m Julia Blank, a junior at Harvard College studying Government on the Data Science Track with a secondary in Computer Science. In my free time, you can find me writing for Harvard Sports Analytics, dancing with the Harvard Dance Team, or as I sit right now, hunkered down in the basement of CGIS south pondering the niche questions of this midterm election. I’m finally putting some pen to paper thanks to Professor Ryan Enos’ course Election Analytics this semester. So check back in with me each week to stay up to date with my thoughts on elections past and present as we rapidly approach the 2022 election.</p>
+<p>For today, I’m looking to the past to inform a bit more about our present. To begin, I’m investigating the question: Given the very real process of gerrymandering, how does vote share and seat share line up in a midterm election? In order to explore this question, I have chosen to look at the election year 2010. 2010 was a unique midterm election that is often referred to as the “Red Sweep”. In 2008, former President Obama took office and the Senate and House of Representatives were all dominated by the Democratic Party. The years between were quite chaotic with the financial crisis and unemployment. Going into the midterm elections, the nation was anxious to see how people would respond to this Democratic dominance in the Presidency and legislature.</p>
+<p>To begin to answer the questions on the impact of districting, I first had to look at the vote share across the nation in the election for the House of Representatives in 2010. To do so, I obtained data that illustrates the number of votes Republicans and Democrats received in every district in America. To calculate vote share by party in each state, I took all the districts within one state and calculated a collective vote share margin for Republicans by adding up all Republican Votes and taking it as a proportion of all votes cast for Republicans and Democrats. I then calculated the same vote share for the Democratic Party. In order to see the margin in vote share, I subtracted the Republican Vote Share from the Democrats Vote Share. As such, in the image below you can see that larger margin numbers correspond to red and a stronger Republican party while more negative numbers correspond to a blue and a stronger Democratic party vote share.</p>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>## ✔ ggplot2 3.3.5     ✔ purrr   0.3.4
+## ✔ tibble  3.1.6     ✔ dplyr   1.0.7
+## ✔ tidyr   1.2.0     ✔ stringr 1.4.0
+## ✔ readr   2.1.2     ✔ forcats 0.5.1</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre><code>## Rows: 16067 Columns: 31
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (16): Office, State, Area, RepCandidate, RepStatus, DemCandidate, DemSta...
+## dbl (14): raceYear, RepVotes, DemVotes, ThirdVotes, OtherVotes, PluralityVot...
+## lgl  (1): CensusPop
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre><code>##  [1] &quot;AL&quot; &quot;AK&quot; &quot;AZ&quot; &quot;AR&quot; &quot;CA&quot; &quot;CO&quot; &quot;CT&quot; &quot;DE&quot; &quot;DC&quot; &quot;FL&quot; &quot;GA&quot; &quot;HI&quot; &quot;ID&quot; &quot;IL&quot; &quot;IN&quot;
+## [16] &quot;IA&quot; &quot;KS&quot; &quot;KY&quot; &quot;LA&quot; &quot;ME&quot; &quot;MD&quot; &quot;MA&quot; &quot;MI&quot; &quot;MN&quot; &quot;MS&quot; &quot;MO&quot; &quot;MT&quot; &quot;NE&quot; &quot;NV&quot; &quot;NH&quot;
+## [31] &quot;NJ&quot; &quot;NM&quot; &quot;NY&quot; &quot;NC&quot; &quot;ND&quot; &quot;OH&quot; &quot;OK&quot; &quot;OR&quot; &quot;PA&quot; &quot;RI&quot; &quot;SC&quot; &quot;SD&quot; &quot;TN&quot; &quot;TX&quot; &quot;UT&quot;
+## [46] &quot;VT&quot; &quot;VA&quot; &quot;WA&quot; &quot;WV&quot; &quot;WI&quot; &quot;WY&quot;</code></pre>
+<p><img src="http://example.org/post/2022-09-14-test-post-1/index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>In the image above, we can see a predominately Republican landscape in terms of vote share margin. This “red wave” demonstrates a leading positive vote share margin in favor of republicans in most of the country. There are a few predictable pockets of a Democratic vote share lead in the North East and on the West Coast. Uniquely in this map, while the Republicans swept the landscape the margin in vote share between the two parties never reached a greater magnitude than a 0.5 lead. Such is the nature of our two party system, where one party even if they lead rarely ever leads by a vote share margin of 1.</p>
+<p>With the map of vote share margin between the two parties in mind, we can now compare the similarities in the seat share for that very same election. To examine this, instead of looking at the amount of votes each party one we look at the number of seats a party one in a given state. To find the margin of seat share, I subtracted the Republican seat share value from the Democratic seat share value. As such, the corresponding map associates a larger more positive margin value with Republican seat share success and a more negative margin value with Democratic seat share success.</p>
+<pre class="r"><code>#setwd(&#39;~/Documents/GOV 50 PROJECTS/electionanalytics&#39;)
+Gerry_2010 &lt;- read_csv(&#39;Gov 1347/export.csv&#39;, col_names = TRUE, skip = 2) </code></pre>
+<pre><code>## Warning: One or more parsing issues, see `problems()` for details</code></pre>
+<pre><code>## Rows: 56 Columns: 14
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (14): Office, RaceDate, CensusPop, Area, RepWinner, DemWinner, OtherWinn...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>Gerry_2010$Area &lt;- as.character(Gerry_2010$Area)
+Gerry_2010$DemWinner &lt;- as.numeric(Gerry_2010$DemWinner)</code></pre>
+<pre><code>## Warning: NAs introduced by coercion</code></pre>
+<pre class="r"><code>Gerry_2010$RepWinner &lt;- as.numeric(Gerry_2010$RepWinner)</code></pre>
+<pre><code>## Warning: NAs introduced by coercion</code></pre>
+<pre class="r"><code>Gerry_2010clean &lt;- Gerry_2010 %&gt;%
+  slice(-c(51:56))
+  
+ # drop_na()
+
+#%&gt;%
+Gerry_2010final&lt;- Gerry_2010clean %&gt;%
+  group_by(Area)%&gt;%
+  mutate(R_seatmarg = (sum(RepWinner))/sum(RepWinner + DemWinner),
+         D_seatmarg = (sum(DemWinner))/sum(RepWinner + DemWinner)) %&gt;%
+  mutate(Margin_diff = R_seatmarg - D_seatmarg) %&gt;%
+  rename(state = Area)
+  
+plot_usmap(data = Gerry_2010final, regions = &quot;states&quot;, values = &quot;Margin_diff&quot;, labels = TRUE) +
+#facet_wrap(facets = raceYear ~.) +
+  scale_fill_gradient2(low = &quot;royalblue2&quot;, mid = &quot;white&quot;, high = &quot;red&quot;, name = &quot;Seat Share Margin&quot;, limits = (c(-1,1))) +
+  theme(legend.position=&quot;top&quot;) +
+  labs(title = &quot;Map of Seat Share Margin in the 2010 Election&quot;)+
+  theme_void()</code></pre>
+<p><img src="http://example.org/post/2022-09-14-test-post-1/index_files/figure-html/unnamed-chunk-2-1.png" width="672" />
+In the map of seat share, the strength of the Republican party seen in the vote share map seems to be even stronger. Uniquely, the colors in this map of seat share margin is much more vivid than that of vote share margin, demonstrating a clear dissonance between the two metrics. While in the map of vote share the Republican party could see small leads in vote share across the nation, the map of seat share demonstrates a stark dominance. Even for the Democratic party, in places where they had slight leads in vote margin like Maine or New Mexico, they ended up receiving a much larger margin of seats for the state.</p>
+<p>So, why does this happen? The answer is the unique process of districting and the complexity of Gerrymandering in the US electoral system. Gerrymandering as a process requires drawing and manipulating the boundaries of districts in order to favor a party of another. Through tactics of fragmentation and packing, parties can draw districts to give themselves a seat share advantage. It’s important to note that gerrymandering won’t appear in vote share margins but will impact the seat share. As illustrated by the 2010 maps, the seat share almost always exacerbates the margin of vote share. Numerous states, like Michigan, that only saw small leads in vote share will see massive margins in seat share.</p>
+<p>In fact, the very process of Gerrymandering can take a minority party in vote share and make them the dominant party when it comes to taking seats in the house. In the case of 2010, the most notable examples of this are North Carolina and Iowa. Both of these states had a larger Republican vote share margin but flipped to see a larger Democratic margin when it came to seat share. In the case of these states, it is clear that the Democrats were concentrated in a few districts (1, 2, 3) while the Republican majority was strongest in just two districts (4,5). With numerous states flipping party dominance based on the metric chosen, be it vote share or seat share, it is important to note this feature of our democratic system. The result of elections do change quite drastically from vote share as districting transforms these calculations to seat share.</p>
+<p>While many argue about the integrity of a system that doesn’t align directly with populations vote share, I won’t in the post sit and pass judgment. However, I do find it important to remark on this as it pertains to my mission this semester. As we go forth together into this election modeling journey, it will be essential for me to both highlight the metrics I’m calculating, acknowledge the limitations of this metric, and explain how it may fit into the broader democratic system.</p>
+<p>Citation:
+“Measuring the Size of Election 2010’s Republican Sweep.” Accessed September 15, 2022. <a href="https://www.usnews.com/opinion/blogs/peter-roff/2010/11/05/measuring-the-size-of-election-2010s-republican-sweep" class="uri">https://www.usnews.com/opinion/blogs/peter-roff/2010/11/05/measuring-the-size-of-election-2010s-republican-sweep</a>.</p>
+<p>House general elections, All States, 2010 summary. (2022). CQ voting and elections collection (web site). <a href="http://library.cqpress.com/elections/avg2010-3us1" class="uri">http://library.cqpress.com/elections/avg2010-3us1</a></p>
+<p>All other data from lab.</p>
 
 
 		
@@ -80,7 +149,7 @@
         		<footer>
 			
 			<span>
-			&copy; <time datetime="2022-09-14 20:17:02.220966 -0400 EDT m=&#43;0.061742498">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2022-09-15 09:50:08.732119 -0400 EDT m=&#43;4.487507461">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
