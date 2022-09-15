@@ -1,8 +1,10 @@
 ---
-title: "Test Post 1"
+title: 'Blog Post 1: Gerrymandering: Tensions of Vote Share and Seat Share'
 author: "Julia Blank"
 date: '2022-09-14'
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 categories: []
 tags: []
 slug: []
@@ -15,6 +17,9 @@ For today, I’m looking to the past to inform a bit more about our present. To 
 
 To begin to answer the questions on the impact of districting, I first had to look at the vote share across the nation in the election for the House of Representatives in 2010. To do so, I obtained data that illustrates the number of votes Republicans and Democrats received in every district in America. To calculate vote share by party in each state, I took all the districts within one state and calculated a collective vote share margin for Republicans by adding up all Republican Votes and taking it as a proportion of all votes cast for Republicans and Democrats. I then calculated the same vote share for the Democratic Party. In order to see the margin in vote share, I subtracted the Republican Vote Share from the Democrats Vote Share. As such, in the image below you can see that larger margin numbers correspond to red and a stronger Republican party while more negative numbers correspond to a blue and a stronger Democratic party vote share. 
 
+```{r}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE) 
+```
 
 
 ```{r, echo = FALSE, warning = FALSE}
