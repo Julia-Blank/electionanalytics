@@ -7,7 +7,7 @@ categories: []
 tags: []
 ---
 
-```{r}
+```{r,echo = FALSE, warning = FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE) 
 # Loading in necessary libraries
 

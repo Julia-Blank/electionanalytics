@@ -9,56 +9,29 @@ tags: []
 
 
 
-<pre class="r"><code>knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE) 
-# Loading in necessary libraries
-
-library(tidyverse)</code></pre>
 <pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
 <pre><code>## ✔ ggplot2 3.3.5     ✔ purrr   0.3.4
 ## ✔ tibble  3.1.6     ✔ dplyr   1.0.7
 ## ✔ tidyr   1.2.0     ✔ stringr 1.4.0
 ## ✔ readr   2.1.2     ✔ forcats 0.5.1</code></pre>
-<pre><code>## Warning: package &#39;tidyr&#39; was built under R version 4.0.5</code></pre>
-<pre><code>## Warning: package &#39;readr&#39; was built under R version 4.0.5</code></pre>
 <pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>library(ggplot2)
-library(stargazer)</code></pre>
-<pre><code>## Warning: package &#39;stargazer&#39; was built under R version 4.0.5</code></pre>
 <pre><code>## 
 ## Please cite as:</code></pre>
 <pre><code>##  Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.</code></pre>
 <pre><code>##  R package version 5.2.3. https://CRAN.R-project.org/package=stargazer</code></pre>
-<pre class="r"><code>library(janitor)</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;janitor&#39;</code></pre>
 <pre><code>## The following objects are masked from &#39;package:stats&#39;:
 ## 
 ##     chisq.test, fisher.test</code></pre>
-<pre class="r"><code>library(readxl)</code></pre>
-<pre><code>## Warning: package &#39;readxl&#39; was built under R version 4.0.5</code></pre>
-<pre class="r"><code>library(tidyverse)
-library(ggplot2)
-library(blogdown)
-library(stargazer)
-library(readr)
-library(usmap)</code></pre>
-<pre><code>## Warning: package &#39;usmap&#39; was built under R version 4.0.5</code></pre>
-<pre class="r"><code>library(rmapshaper)</code></pre>
 <pre><code>## Registered S3 method overwritten by &#39;geojsonlint&#39;:
 ##   method         from 
 ##   print.location dplyr</code></pre>
-<pre class="r"><code>library(sf)</code></pre>
-<pre><code>## Warning: package &#39;sf&#39; was built under R version 4.0.5</code></pre>
 <pre><code>## Linking to GEOS 3.9.1, GDAL 3.4.0, PROJ 8.1.1; sf_use_s2() is TRUE</code></pre>
-<pre class="r"><code>library(janitor)
-library(tigris)</code></pre>
-<pre><code>## Warning: package &#39;tigris&#39; was built under R version 4.0.5</code></pre>
 <pre><code>## To enable caching of data, set `options(tigris_use_cache = TRUE)`
 ## in your R script or .Rprofile.</code></pre>
-<pre class="r"><code>library(leaflet)</code></pre>
-<pre><code>## Warning: package &#39;leaflet&#39; was built under R version 4.0.5</code></pre>
 <p>Hi everyone! We’re back this week with another set of models this time exploring the important concepts of expert prediction and incumbency. This week through building models with expert predictions and incumbency, I’ve set out to investigate: How well do experts do at explaining election outcomes on average and does incumbency have a redundant effect or add something profound to our own predictions?</p>
 <p>To first begin investigating this question, I explored how well expert predictions have historically predicted elections in the past. I did this by comparing the true Democratic vote Share in the 2018 midterms to the expert predictions of party victory in each district. To do this, I first started by aggregating the true democratic vote share for each district and mapping them. The states with the most vote share (above 50%) are the bluest and the states with the least democratic vote share (under 50%) are the reddest, while the tossup states are the whitest. The map can be viewed below.</p>
 <pre><code>## 
@@ -85,8 +58,6 @@ library(tigris)</code></pre>
   |                                                                            
   |====                                                                  |   6%
   |                                                                            
-  |=====                                                                 |   6%
-  |                                                                            
   |=====                                                                 |   7%
   |                                                                            
   |=====                                                                 |   8%
@@ -108,8 +79,6 @@ library(tigris)</code></pre>
   |=========                                                             |  12%
   |                                                                            
   |=========                                                             |  13%
-  |                                                                            
-  |=========                                                             |  14%
   |                                                                            
   |==========                                                            |  14%
   |                                                                            
@@ -153,15 +122,11 @@ library(tigris)</code></pre>
   |                                                                            
   |==================                                                    |  26%
   |                                                                            
-  |===================                                                   |  26%
-  |                                                                            
   |===================                                                   |  27%
   |                                                                            
   |===================                                                   |  28%
   |                                                                            
   |====================                                                  |  28%
-  |                                                                            
-  |====================                                                  |  29%
   |                                                                            
   |=====================                                                 |  29%
   |                                                                            
@@ -197,8 +162,6 @@ library(tigris)</code></pre>
   |                                                                            
   |===========================                                           |  39%
   |                                                                            
-  |============================                                          |  39%
-  |                                                                            
   |============================                                          |  40%
   |                                                                            
   |============================                                          |  41%
@@ -233,6 +196,14 @@ library(tigris)</code></pre>
   |                                                                            
   |===================================                                   |  50%
   |                                                                            
+  |===================================                                   |  51%
+  |                                                                            
+  |====================================                                  |  51%
+  |                                                                            
+  |====================================                                  |  52%
+  |                                                                            
+  |=====================================                                 |  52%
+  |                                                                            
   |=====================================                                 |  53%
   |                                                                            
   |=====================================                                 |  54%
@@ -248,14 +219,6 @@ library(tigris)</code></pre>
   |========================================                              |  56%
   |                                                                            
   |========================================                              |  57%
-  |                                                                            
-  |========================================                              |  58%
-  |                                                                            
-  |=========================================                             |  58%
-  |                                                                            
-  |=========================================                             |  59%
-  |                                                                            
-  |==========================================                            |  59%
   |                                                                            
   |==========================================                            |  60%
   |                                                                            
@@ -380,6 +343,8 @@ library(tigris)</code></pre>
   |===================================================================   |  95%
   |                                                                            
   |===================================================================   |  96%
+  |                                                                            
+  |====================================================================  |  96%
   |                                                                            
   |====================================================================  |  97%
   |                                                                            
