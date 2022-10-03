@@ -1,0 +1,889 @@
+---
+title: 'Blog Post 4: Expert Prediction and Incumbency'
+author: Julia Blank
+date: '2022-10-03'
+slug: []
+categories: []
+tags: []
+---
+
+
+
+<pre class="r"><code>knitr::opts_chunk$set(echo = TRUE)
+# Loading in necessary libraries
+
+library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>## ✔ ggplot2 3.3.5     ✔ purrr   0.3.4
+## ✔ tibble  3.1.6     ✔ dplyr   1.0.7
+## ✔ tidyr   1.2.0     ✔ stringr 1.4.0
+## ✔ readr   2.1.2     ✔ forcats 0.5.1</code></pre>
+<pre><code>## Warning: package &#39;tidyr&#39; was built under R version 4.0.5</code></pre>
+<pre><code>## Warning: package &#39;readr&#39; was built under R version 4.0.5</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(ggplot2)
+library(stargazer)</code></pre>
+<pre><code>## Warning: package &#39;stargazer&#39; was built under R version 4.0.5</code></pre>
+<pre><code>## 
+## Please cite as:</code></pre>
+<pre><code>##  Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.</code></pre>
+<pre><code>##  R package version 5.2.3. https://CRAN.R-project.org/package=stargazer</code></pre>
+<pre class="r"><code>library(janitor)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;janitor&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     chisq.test, fisher.test</code></pre>
+<pre class="r"><code>library(readxl)</code></pre>
+<pre><code>## Warning: package &#39;readxl&#39; was built under R version 4.0.5</code></pre>
+<pre class="r"><code>library(tidyverse)
+library(ggplot2)
+library(blogdown)
+library(stargazer)
+library(readr)
+library(usmap)</code></pre>
+<pre><code>## Warning: package &#39;usmap&#39; was built under R version 4.0.5</code></pre>
+<pre class="r"><code>library(rmapshaper)</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;geojsonlint&#39;:
+##   method         from 
+##   print.location dplyr</code></pre>
+<pre class="r"><code>library(sf)</code></pre>
+<pre><code>## Warning: package &#39;sf&#39; was built under R version 4.0.5</code></pre>
+<pre><code>## Linking to GEOS 3.9.1, GDAL 3.4.0, PROJ 8.1.1; sf_use_s2() is TRUE</code></pre>
+<pre class="r"><code>library(janitor)
+library(tigris)</code></pre>
+<pre><code>## Warning: package &#39;tigris&#39; was built under R version 4.0.5</code></pre>
+<pre><code>## To enable caching of data, set `options(tigris_use_cache = TRUE)`
+## in your R script or .Rprofile.</code></pre>
+<pre class="r"><code>library(leaflet)</code></pre>
+<pre><code>## Warning: package &#39;leaflet&#39; was built under R version 4.0.5</code></pre>
+<pre class="r"><code>#LOAD IN REQUISITE DATA SETS
+expert_ratings &lt;- read_csv(&quot;04-Incumbency-9-29-/Section-data/District-level-forecast/expert_rating.csv&quot;)</code></pre>
+<pre><code>## Rows: 766 Columns: 19
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (2): state, district
+## dbl (17): year, cook, rothenberg, cq_politics, sabatos_crystal_ball, real_cl...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>historical_results &lt;- read_csv(&quot;04-Incumbency-9-29-/Section-data/District-level-forecast/house party vote share by district 1948-2020.csv&quot;) %&gt;%
+  clean_names()</code></pre>
+<pre><code>## Rows: 16067 Columns: 31
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (16): Office, State, Area, RepCandidate, RepStatus, DemCandidate, DemSta...
+## dbl (14): raceYear, RepVotes, DemVotes, ThirdVotes, OtherVotes, PluralityVot...
+## lgl  (1): CensusPop
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>incumb_dist_1948_2022_2_ &lt;- read_csv(&quot;04-Incumbency-9-29-/Section-data/incumb_dist_1948-2022 (2).csv&quot;)</code></pre>
+<pre><code>## New names:
+## * `` -&gt; ...1
+## Rows: 16067 Columns: 19── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (13): office, state, st_fips, district_num, district_id, winner_party, R...
+## dbl  (6): ...1, year, RepVotes, DemVotes, RepVotesMajorPercent, DemVotesMajo...
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>roper_cong_polls_1979_2022 &lt;- read_csv(&quot;04-Incumbency-9-29-/roper_cong_polls_1979-2022.csv&quot;)</code></pre>
+<pre><code>## New names:
+## * `` -&gt; ...18
+## * `` -&gt; ...19
+## * `` -&gt; ...20
+## * `` -&gt; ...21
+## * `` -&gt; ...22
+## * ...
+## Rows: 985 Columns: 25── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (16): QuestionID, RespTxt, RespPct, QuestionTxt, QuestionNote, SubPopula...
+## dbl  (1): SampleSize
+## lgl  (8): ...18, ...19, ...20, ...21, ...22, ...23, ...24, ...25
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<p>Hi everyone! We’re back this week with another set of models this time exploring the important concepts of expert prediction and incumbency. This week through building models with expert predictions and incumbency, I’ve set out to investigate: How well do experts do at explaining election outcomes on average and does incumbency have a redundant effect or add something profound to our own predictions?</p>
+<p>To first begin investigating this question, I explored how well expert predictions have historically predicted elections in the past. I did this by comparing the true Democratic vote Share in the 2018 midterms to the expert predictions of party victory in each district. To do this, I first started by aggregating the true democratic vote share for each district and mapping them. The states with the most vote share (above 50%) are the bluest and the states with the least democratic vote share (under 50%) are the reddest, while the tossup states are the whitest. The map can be viewed below.</p>
+<pre class="r"><code>#find data for the democrats from historical results
+democrats_2018 &lt;- historical_results %&gt;% 
+  select(race_year, state, area, dem_votes_major_percent, rep_votes_major_percent, rep_votes, dem_votes, rep_status, dem_status, winner_party) %&gt;% 
+  rename(&quot;year&quot; = &quot;race_year&quot;) %&gt;% 
+  filter(year == 2018) %&gt;%
+  separate(area, into = c(&quot;area&quot;, &quot;district&quot;), sep = &quot; &quot;) %&gt;% 
+  select(-area) %&gt;% 
+  mutate(district = case_when(
+    district == &quot;Large&quot; ~ &quot;AL&quot;,
+    TRUE ~ district
+    ))
+
+
+democrats_2018$district[is.na(democrats_2018$district)] = 1
+
+democrats_2018 &lt;- democrats_2018 %&gt;%
+   mutate(district = case_when(
+    district == &quot;AL&quot; ~ &quot;1&quot;,
+    TRUE ~ district
+  ))
+
+#turn district from char to number
+democrats_2018$district &lt;- as.numeric(democrats_2018$district)
+
+#grab map
+cd116 &lt;- congressional_districts(
+  state = NULL,
+  cb = FALSE,
+  resolution = &quot;500k&quot;,
+  year = 2018)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |                                                                      |   0%
+  |                                                                            
+  |                                                                      |   1%
+  |                                                                            
+  |=                                                                     |   1%
+  |                                                                            
+  |=                                                                     |   2%
+  |                                                                            
+  |==                                                                    |   2%
+  |                                                                            
+  |==                                                                    |   3%
+  |                                                                            
+  |==                                                                    |   4%
+  |                                                                            
+  |===                                                                   |   4%
+  |                                                                            
+  |===                                                                   |   5%
+  |                                                                            
+  |====                                                                  |   5%
+  |                                                                            
+  |====                                                                  |   6%
+  |                                                                            
+  |=====                                                                 |   6%
+  |                                                                            
+  |=====                                                                 |   7%
+  |                                                                            
+  |=====                                                                 |   8%
+  |                                                                            
+  |======                                                                |   8%
+  |                                                                            
+  |======                                                                |   9%
+  |                                                                            
+  |=======                                                               |   9%
+  |                                                                            
+  |=======                                                               |  10%
+  |                                                                            
+  |=======                                                               |  11%
+  |                                                                            
+  |========                                                              |  11%
+  |                                                                            
+  |========                                                              |  12%
+  |                                                                            
+  |=========                                                             |  12%
+  |                                                                            
+  |=========                                                             |  13%
+  |                                                                            
+  |=========                                                             |  14%
+  |                                                                            
+  |==========                                                            |  14%
+  |                                                                            
+  |==========                                                            |  15%
+  |                                                                            
+  |===========                                                           |  15%
+  |                                                                            
+  |===========                                                           |  16%
+  |                                                                            
+  |============                                                          |  16%
+  |                                                                            
+  |============                                                          |  17%
+  |                                                                            
+  |============                                                          |  18%
+  |                                                                            
+  |=============                                                         |  18%
+  |                                                                            
+  |=============                                                         |  19%
+  |                                                                            
+  |==============                                                        |  19%
+  |                                                                            
+  |==============                                                        |  20%
+  |                                                                            
+  |==============                                                        |  21%
+  |                                                                            
+  |===============                                                       |  21%
+  |                                                                            
+  |===============                                                       |  22%
+  |                                                                            
+  |================                                                      |  22%
+  |                                                                            
+  |================                                                      |  23%
+  |                                                                            
+  |================                                                      |  24%
+  |                                                                            
+  |=================                                                     |  24%
+  |                                                                            
+  |=================                                                     |  25%
+  |                                                                            
+  |==================                                                    |  25%
+  |                                                                            
+  |==================                                                    |  26%
+  |                                                                            
+  |===================                                                   |  27%
+  |                                                                            
+  |===================                                                   |  28%
+  |                                                                            
+  |====================                                                  |  28%
+  |                                                                            
+  |====================                                                  |  29%
+  |                                                                            
+  |=====================                                                 |  29%
+  |                                                                            
+  |=====================                                                 |  30%
+  |                                                                            
+  |=====================                                                 |  31%
+  |                                                                            
+  |======================                                                |  31%
+  |                                                                            
+  |======================                                                |  32%
+  |                                                                            
+  |=======================                                               |  32%
+  |                                                                            
+  |=======================                                               |  33%
+  |                                                                            
+  |=======================                                               |  34%
+  |                                                                            
+  |========================                                              |  34%
+  |                                                                            
+  |========================                                              |  35%
+  |                                                                            
+  |=========================                                             |  35%
+  |                                                                            
+  |=========================                                             |  36%
+  |                                                                            
+  |==========================                                            |  36%
+  |                                                                            
+  |==========================                                            |  37%
+  |                                                                            
+  |==========================                                            |  38%
+  |                                                                            
+  |===========================                                           |  38%
+  |                                                                            
+  |===========================                                           |  39%
+  |                                                                            
+  |============================                                          |  39%
+  |                                                                            
+  |============================                                          |  40%
+  |                                                                            
+  |============================                                          |  41%
+  |                                                                            
+  |=============================                                         |  41%
+  |                                                                            
+  |=============================                                         |  42%
+  |                                                                            
+  |==============================                                        |  42%
+  |                                                                            
+  |==============================                                        |  43%
+  |                                                                            
+  |===============================                                       |  44%
+  |                                                                            
+  |===============================                                       |  45%
+  |                                                                            
+  |================================                                      |  45%
+  |                                                                            
+  |================================                                      |  46%
+  |                                                                            
+  |=================================                                     |  46%
+  |                                                                            
+  |=================================                                     |  47%
+  |                                                                            
+  |=================================                                     |  48%
+  |                                                                            
+  |==================================                                    |  48%
+  |                                                                            
+  |==================================                                    |  49%
+  |                                                                            
+  |===================================                                   |  49%
+  |                                                                            
+  |===================================                                   |  50%
+  |                                                                            
+  |===================================                                   |  51%
+  |                                                                            
+  |====================================                                  |  51%
+  |                                                                            
+  |====================================                                  |  52%
+  |                                                                            
+  |=====================================                                 |  52%
+  |                                                                            
+  |=====================================                                 |  53%
+  |                                                                            
+  |=====================================                                 |  54%
+  |                                                                            
+  |======================================                                |  54%
+  |                                                                            
+  |======================================                                |  55%
+  |                                                                            
+  |=======================================                               |  55%
+  |                                                                            
+  |=======================================                               |  56%
+  |                                                                            
+  |========================================                              |  56%
+  |                                                                            
+  |========================================                              |  57%
+  |                                                                            
+  |========================================                              |  58%
+  |                                                                            
+  |=========================================                             |  58%
+  |                                                                            
+  |=========================================                             |  59%
+  |                                                                            
+  |==========================================                            |  59%
+  |                                                                            
+  |==========================================                            |  60%
+  |                                                                            
+  |==========================================                            |  61%
+  |                                                                            
+  |===========================================                           |  61%
+  |                                                                            
+  |===========================================                           |  62%
+  |                                                                            
+  |============================================                          |  62%
+  |                                                                            
+  |============================================                          |  63%
+  |                                                                            
+  |============================================                          |  64%
+  |                                                                            
+  |=============================================                         |  64%
+  |                                                                            
+  |=============================================                         |  65%
+  |                                                                            
+  |==============================================                        |  65%
+  |                                                                            
+  |==============================================                        |  66%
+  |                                                                            
+  |===============================================                       |  66%
+  |                                                                            
+  |===============================================                       |  67%
+  |                                                                            
+  |===============================================                       |  68%
+  |                                                                            
+  |================================================                      |  68%
+  |                                                                            
+  |================================================                      |  69%
+  |                                                                            
+  |=================================================                     |  70%
+  |                                                                            
+  |=================================================                     |  71%
+  |                                                                            
+  |==================================================                    |  71%
+  |                                                                            
+  |==================================================                    |  72%
+  |                                                                            
+  |===================================================                   |  72%
+  |                                                                            
+  |===================================================                   |  73%
+  |                                                                            
+  |===================================================                   |  74%
+  |                                                                            
+  |====================================================                  |  74%
+  |                                                                            
+  |====================================================                  |  75%
+  |                                                                            
+  |=====================================================                 |  75%
+  |                                                                            
+  |=====================================================                 |  76%
+  |                                                                            
+  |======================================================                |  76%
+  |                                                                            
+  |======================================================                |  77%
+  |                                                                            
+  |======================================================                |  78%
+  |                                                                            
+  |=======================================================               |  78%
+  |                                                                            
+  |=======================================================               |  79%
+  |                                                                            
+  |========================================================              |  79%
+  |                                                                            
+  |========================================================              |  80%
+  |                                                                            
+  |========================================================              |  81%
+  |                                                                            
+  |=========================================================             |  81%
+  |                                                                            
+  |=========================================================             |  82%
+  |                                                                            
+  |==========================================================            |  82%
+  |                                                                            
+  |==========================================================            |  83%
+  |                                                                            
+  |==========================================================            |  84%
+  |                                                                            
+  |===========================================================           |  84%
+  |                                                                            
+  |===========================================================           |  85%
+  |                                                                            
+  |============================================================          |  85%
+  |                                                                            
+  |============================================================          |  86%
+  |                                                                            
+  |=============================================================         |  86%
+  |                                                                            
+  |=============================================================         |  87%
+  |                                                                            
+  |=============================================================         |  88%
+  |                                                                            
+  |==============================================================        |  88%
+  |                                                                            
+  |==============================================================        |  89%
+  |                                                                            
+  |===============================================================       |  89%
+  |                                                                            
+  |===============================================================       |  90%
+  |                                                                            
+  |===============================================================       |  91%
+  |                                                                            
+  |================================================================      |  91%
+  |                                                                            
+  |================================================================      |  92%
+  |                                                                            
+  |=================================================================     |  92%
+  |                                                                            
+  |=================================================================     |  93%
+  |                                                                            
+  |=================================================================     |  94%
+  |                                                                            
+  |==================================================================    |  94%
+  |                                                                            
+  |==================================================================    |  95%
+  |                                                                            
+  |===================================================================   |  95%
+  |                                                                            
+  |===================================================================   |  96%
+  |                                                                            
+  |====================================================================  |  96%
+  |                                                                            
+  |====================================================================  |  97%
+  |                                                                            
+  |====================================================================  |  98%
+  |                                                                            
+  |===================================================================== |  98%
+  |                                                                            
+  |===================================================================== |  99%
+  |                                                                            
+  |======================================================================|  99%
+  |                                                                            
+  |======================================================================| 100%</code></pre>
+<pre class="r"><code>cd116 &lt;- cd116 %&gt;%
+  rename(&quot;state&quot; = &quot;STATEFP&quot;)
+
+#load in state data to correspond numbers to names
+state &lt;- read_csv(&quot;04-Incumbency-9-29-/Section-data/us-state.csv&quot;) %&gt;%
+  rename(state = st)</code></pre>
+<pre><code>## Rows: 51 Columns: 3
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (3): stname, st, stusps
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>district &lt;- cd116 %&gt;%
+  left_join(state, by = &quot;state&quot;)
+  
+district2 &lt;- district %&gt;%
+  select(-c(&quot;state&quot;)) %&gt;%
+  rename(&quot;state&quot; = &quot;stname&quot;, &quot;district&quot; = &quot;CD116FP&quot;, &quot;st&quot; = &quot;stusps&quot;)
+
+district2$district &lt;- as.numeric(district2$district)</code></pre>
+<pre><code>## Warning: NAs introduced by coercion</code></pre>
+<pre class="r"><code>district2 &lt;- district2 %&gt;%
+  mutate(district = case_when(
+    district == 0 ~ 1,
+    TRUE ~ district
+  ))
+
+#join  naming data with democrat data
+joineddata &lt;- district2 %&gt;%
+  left_join(democrats_2018, by = c(&quot;state&quot;, &quot;district&quot;))
+
+cleaneddata &lt;- joineddata %&gt;%
+  filter(state != &quot;Alaska&quot;, state != &quot;Hawaii&quot;) %&gt;%
+  mutate(district = case_when(
+    district == 0 ~ 1,
+    TRUE ~ district
+  )) %&gt;%
+  ms_simplify()
+
+cleaneddata$district &lt;- as.numeric(cleaneddata$district)
+
+#plot vote share percentage for democrats
+ggplot() + 
+  geom_sf(data=cleaneddata,aes(fill=dem_votes_major_percent),
+          inherit.aes=FALSE,alpha=0.9) + 
+  scale_fill_gradient2(low = &quot;tomato&quot;, mid = &quot;white&quot;,  high = &quot;blue&quot;, limits =c(0,100), midpoint = 50, name = &quot;Vote Share Percentage for Democrats&quot;) +
+  theme_void() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank()) +
+  labs(title = &quot;Democratic Vote Share in 2018 Midterms&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>In order to compare efficacy of expert predictions, I then created a map of how likely experts predicted each district was to go to each party. To do so, I combined numerical ratings that expert predictors gave each district based on how likely they were to lean towards a certain partisanship. The scaled range from 1 which mean safely leaning democrat to 7 which meant it was safely lean republican. In the map below, blue is associated with lower numbers and democrats, white(4.0) with the most uncertain swing districts, and red with the highest numbers and republican victories. The image can be seen below.</p>
+<pre class="r"><code>#load in 2018 ratings data
+ratings2018 &lt;- read_csv(&quot;04-Incumbency-9-29-/Section-data/2018_ratings_share.csv&quot;)</code></pre>
+<pre><code>## New names:
+## * `` -&gt; ...1</code></pre>
+<pre><code>## Rows: 435 Columns: 9
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (4): District, cpr, inside_elections, crystal_ball
+## dbl (5): ...1, cpr_num, inside_elections_num, crystal_ball_num, avg
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>#clean ratings data
+ratings2018 &lt;- ratings2018 %&gt;%
+  separate(District, into = c(&quot;state&quot;, &quot;district&quot;), sep = &quot;-&quot;) %&gt;%
+  filter(state != &quot;Alaska&quot;, state != &quot;Hawaii&quot;) %&gt;%
+  rename(&quot;st&quot; = &quot;state&quot;) %&gt;%
+  select(st, district, avg)
+
+#change districts to numbers so join works
+ratings2018$district &lt;- as.numeric(ratings2018$district)
+
+joinedratings &lt;- ratings2018 %&gt;%
+  left_join(cleaneddata, by = c(&quot;st&quot;, &quot;district&quot;)) %&gt;% 
+  st_as_sf()
+
+
+#make map of predicted vote share from experts
+ggplot() + 
+  geom_sf(data=joinedratings, aes(fill=avg),
+          inherit.aes=FALSE,alpha=0.9) + 
+  scale_fill_gradient2(low = &quot;dodger blue&quot;, mid = &quot;white&quot;,  high = &quot;red&quot;, limits=c(1, 7), midpoint = 4, name =&quot;Expert Prediction\n1 = Safely Democrat\n7 = Safely Republican&quot;) +
+  labs(title = &quot;Predicted Democratic Vote Share in 2018 Midterms&quot;) +
+  theme_void() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/expert%20prediction%20maps-1.png" width="672" />
+Comparing the two images, it appears that experts were incredibly accurate at predicting which way districts were going to swing and event the degree to which how large the voting share would be. From the images, the degree of certainty to which experts predicted a state would lean one way or another directly correlated to how far the democratic vote share percentage veered from 50%. The only routine differences I see between the expert predictions and vote share percentage in actuality is that it appears in districts that vote share was more favorable to democrats in regions that experts thought would lean slightly more republican.</p>
+<p>Now that we’ve established that expert predictions in aggregate are quite close to the actual vote share percentage exhibited in historical elections, it is time to see how strong of a predictor they really are. As well as, how might incumbency play a role in our predictions as well.</p>
+<p>Before we get into the nitty gritty of the models, let’s recap that incumbency is one of the most fundamental and talked about variables that go into election predictions. But for those who don’t avidly read Nate Silver’s every tweet, you may be wondering why? So let’s first break this down.</p>
+<p>Incumbency is typically seen as an advantage but the label of being an incumbent itself isn’t necessarily the key determinant of winning on its own, rather it is the meaning behind what having held office before. Being an incumbent can lead to an advantage due to name recognition alone, but also if a candidate is viewed to have done a good job whether it be ensuring economic success or passing favorable legislation for their district. However, poor performance or coincidental measures of performance like the economy may have profoundly negative effects. As such, incumbency itself may not represent the whole picture of an electoral outcome.</p>
+<p>Building off of last week’s models, I recognized that the economic variables of performance used were not good at explaining the variation in two party vote share in an election. As such, I decided to drop this variable from my model altogether. In addition, since I knew I was bringing in expert predictions, and understood that these predictions incorporate polling heavily, I decided to throw out the general poll variable as well. As such, this week I decided to test two models: one with just average expert ratings and another with average expert ratings and incumbency. To start, (due to technical difficulties) I created one model that looks only at democrats. I’m trying to look at how democratic vote share is impacted by whether a democrat is an incumbent or not. For democrats only, the relationship between incumbency and vote shore</p>
+<pre class="r"><code># Selecting columns
+avg_ratings &lt;- expert_ratings %&gt;% 
+  select(year, state, district, avg_rating)
+
+
+historical_results_clean &lt;- historical_results %&gt;%
+  mutate(dem_status = case_when(dem_status == &quot;Incumbent&quot; ~ 1,
+                               TRUE ~ 0),
+         rep_status = case_when(rep_status == &quot;Incumbent&quot; ~ 1,
+                               TRUE ~ 0))
+  
+dem_results &lt;- historical_results_clean %&gt;% 
+  select(race_year, state, area, dem_votes_major_percent, dem_status) %&gt;% 
+  rename(&quot;year&quot; = &quot;race_year&quot;) %&gt;% 
+  separate(area, into = c(&quot;area&quot;, &quot;district&quot;), sep = &quot; &quot;) %&gt;% 
+  select(-area) %&gt;% 
+  mutate(district = case_when(
+    district == &quot;Large&quot; ~ &quot;AL&quot;,
+    TRUE ~ district
+  ))
+
+#rep_results &lt;- historical_results_clean %&gt;% 
+ # select(race_year, state, area, rep_votes_major_percent, rep_status) %&gt;% 
+ # rename(&quot;year&quot; = &quot;race_year&quot;) %&gt;% 
+  #separate(area, into = c(&quot;area&quot;, &quot;district&quot;), sep = &quot; &quot;) %&gt;% 
+  #select(-area) %&gt;% 
+ # mutate(district = case_when(
+  #  district == &quot;Large&quot; ~ &quot;AL&quot;,
+ #   TRUE ~ district
+  #))
+
+
+# Joining the data and nesting by state and district
+train_data_dem &lt;- avg_ratings %&gt;% 
+  filter(year != 2022) %&gt;% 
+  # left join as there aren&#39;t ratings for every district
+  left_join(dem_results, by = c(&quot;year&quot;, &quot;state&quot;, &quot;district&quot;)) %&gt;% 
+  group_by(state, district) %&gt;% 
+  filter(n() &gt; 1) %&gt;% # Filtering out single data rows
+  group_nest() %&gt;% 
+  mutate(data = map(data, ~unnest(., cols = c())))
+
+
+#train_data_rep &lt;- avg_ratings %&gt;% 
+  #filter(year != 2022) %&gt;% 
+  # left join as there aren&#39;t ratings for every district
+ # left_join(rep_results, by = c(&quot;year&quot;, &quot;state&quot;, &quot;district&quot;)) %&gt;% 
+  #group_by(state, district) %&gt;% 
+ # filter(n() &gt; 1) %&gt;% # Filtering out single data rows
+ # group_nest() %&gt;% 
+  #mutate(data = map(data, ~unnest(., cols = c())))</code></pre>
+<pre class="r"><code>#run democrat and republican model on respective training dataset
+modelsdem &lt;- train_data_dem %&gt;% 
+  mutate(modeldem = map(data, ~lm(dem_votes_major_percent ~ avg_rating + dem_status, 
+                                  data = .x))) %&gt;%
+  select(-data)
+
+modelsnoincumbent &lt;- train_data_dem %&gt;% 
+  mutate(modelnoincumb = map(data, ~lm(dem_votes_major_percent ~ avg_rating, 
+                                  data = .x))) %&gt;%
+  select(-data)
+##modelsrep &lt;- train_data_rep %&gt;% 
+  ##mutate(modelrep = map(data, ~lm(rep_votes_major_percent ~ avg_rating + rep_status, 
+                                 ## data = .x))) %&gt;%
+  ##select(-data)
+
+model_results_dem &lt;- modelsdem %&gt;% 
+  mutate(r_squared = map_dbl(modeldem, ~summary(.x)$r.squared))
+
+
+
+modelsnoincumbent_results &lt;- modelsnoincumbent %&gt;% 
+  mutate(r_squared = map_dbl(modelnoincumb, ~summary(.x)$r.squared))
+##model_results_rep &lt;- modelsrep %&gt;% 
+ ## mutate(r_squared = map_dbl(modelrep, ~summary(.x)$r.squared))</code></pre>
+<p>The first model predicts democratic vote share based upon average expert ratings and incumbency. After training it on historical data for each district, the model predicted that among all districts nationally that democrats in 2022 would win yielded on average for all districts an r^2 value of 0.7814, which is the highest of all my models thus far. This says that combining expert predictions and incumbency is a promising way of explaining variation in democratic vote share percentage in an election.</p>
+<pre class="r"><code>#creating testdata
+
+test2022attempt &lt;- avg_ratings %&gt;%
+  mutate(dem_status = 1)
+
+test_data &lt;- test2022attempt %&gt;% 
+  filter(year == 2022) %&gt;% 
+  group_by(state, district) %&gt;% 
+  group_nest() %&gt;% 
+  mutate(datad = map(data, ~unnest(., cols = c())))
+
+#predictions 2022 for models dem with incumbent
+pred_2022 &lt;- test_data %&gt;%
+  # inner join as there may not be historical models for some districts
+  inner_join(modelsdem, by = c(&quot;state&quot;, &quot;district&quot;)) %&gt;% 
+  mutate(pred = map_dbl(.x = modeldem, .y = datad, ~predict(object = .x, newdata = as.data.frame(.y)))) %&gt;%
+  select(state, district, pred)</code></pre>
+<pre><code>## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading
+
+## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading</code></pre>
+<pre class="r"><code>#print(pred_2022)
+
+## NUMBER OF DISTRICTS DEMS PREDICTED TO WIN VOTE SHARE
+numofdistricts &lt;- pred_2022 %&gt;%
+  mutate(demwin = case_when(pred&gt;=50 ~ 1,
+                            TRUE ~0
+  )) %&gt;%
+  summarise(sum(demwin)/94)
+
+
+##AVERAGE prediction for dem vote share
+averagepred &lt;- pred_2022 %&gt;%
+  summarize(mean(pred)) %&gt;% pull
+
+
+##AVERAGE R2 for w/ incumbency
+
+r2average &lt;- model_results_dem %&gt;%
+  summarize(mean(r_squared))</code></pre>
+<pre class="r"><code>#predictions for models no incumbent
+
+#predictions 2022 for models dem with incumbent
+pred_2022_noincumb &lt;- test_data %&gt;%
+  # inner join as there may not be historical models for some districts
+  inner_join(modelsnoincumbent, by = c(&quot;state&quot;, &quot;district&quot;)) %&gt;% 
+  mutate(pred = map_dbl(.x = modelnoincumb, .y = datad, ~predict(object = .x, newdata = as.data.frame(.y)))) %&gt;%
+  select(state, district, pred)</code></pre>
+<pre><code>## Warning in predict.lm(object = .x, newdata = as.data.frame(.y)): prediction from
+## a rank-deficient fit may be misleading</code></pre>
+<pre class="r"><code>#print(pred_2022_noincumb)
+
+## NUMBER OF DISTRICTS DEMS PREDICTED TO WIN VOTE SHARE
+numofdistricts &lt;- pred_2022 %&gt;%
+  mutate(demwin = case_when(pred&gt;=50 ~ 1,
+                            TRUE ~0
+  )) %&gt;%
+  summarise(sum(demwin)/94)
+
+
+##AVERAGE prediction for dem vote share
+averagepred &lt;- pred_2022 %&gt;%
+  summarize(mean(pred)) %&gt;% pull
+
+##AVERAGE R2 for w/ incumbency
+
+r2average &lt;- modelsnoincumbent_results %&gt;%
+  summarize(mean(r_squared))</code></pre>
+<pre class="r"><code>#looking at my district specifically in both models
+
+p8incumb &lt;- model_results_dem %&gt;%
+  filter(state == &quot;Pennsylvania&quot;, district == &quot;8&quot;)## %&gt;%
+  ##unnest()
+
+p8noincumb &lt;- modelsnoincumbent_results %&gt;%
+  filter(state == &quot;Pennsylvania&quot;, district == &quot;8&quot;) ##%&gt;%
+ ## unnest()
+
+stargazer(p8incumb$modeldem, p8noincumb$modelnoincumb, type = &quot;text&quot;)</code></pre>
+<pre><code>## 
+## ==============================================================
+##                                Dependent variable:            
+##                     ------------------------------------------
+##                              dem_votes_major_percent          
+##                             (1)                   (2)         
+## --------------------------------------------------------------
+## avg_rating                 -1.875              -2.802***      
+##                           (0.990)               (0.397)       
+##                                                               
+## dem_status                 2.984                              
+##                           (2.923)                             
+##                                                               
+## Constant                 54.132***             58.763***      
+##                           (4.800)               (1.582)       
+##                                                               
+## --------------------------------------------------------------
+## Observations                 5                     5          
+## R2                         0.963                 0.943        
+## Adjusted R2                0.925                 0.924        
+## Residual Std. Error    1.276 (df = 2)       1.285 (df = 3)    
+## F Statistic         25.725** (df = 2; 2) 49.708*** (df = 1; 3)
+## ==============================================================
+## Note:                              *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<pre class="r"><code>#p8 &lt;- p8$model[,1]
+
+#predict(p8, data.frame(avg_rating  = 4, dem_status = 1))</code></pre>
+<p>CITATIONS:
+Campbell, J. E., &amp; Mann, T. E. (2016, July 28). Forecasting the presidential election: What can we learn from the models? Brookings. Retrieved October 3, 2022, from <a href="https://www.brookings.edu/articles/forecasting-the-presidential-election-what-can-we-learn-from-the-models/" class="uri">https://www.brookings.edu/articles/forecasting-the-presidential-election-what-can-we-learn-from-the-models/</a></p>

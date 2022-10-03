@@ -6,9 +6,18 @@
     <description>Recent content on My New Hugo Site</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 14 Sep 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 03 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Blog Post 1: Gerrymandering: Tensions of Vote Share and Seat Share</title>
+      <title>Blog Post 4: Expert Prediction and Incumbency</title>
+      <link>http://example.org/post/2022-10-03-blog-post-4-expert-prediction-and-incumbency/</link>
+      <pubDate>Mon, 03 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://example.org/post/2022-10-03-blog-post-4-expert-prediction-and-incumbency/</guid>
+      <description>knitr::opts_chunk$set(echo = TRUE) # Loading in necessary libraries library(tidyverse) ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ── ## ✔ ggplot2 3.3.5 ✔ purrr 0.3.4 ## ✔ tibble 3.1.6 ✔ dplyr 1.0.7 ## ✔ tidyr 1.2.0 ✔ stringr 1.4.0 ## ✔ readr 2.1.2 ✔ forcats 0.5.1 ## Warning: package &amp;#39;tidyr&amp;#39; was built under R version 4.0.5 ## Warning: package &amp;#39;readr&amp;#39; was built under R version 4.0.5 ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ── ## ✖ dplyr::filter() masks stats::filter() ## ✖ dplyr::lag() masks stats::lag() library(ggplot2) library(stargazer) ## Warning: package &amp;#39;stargazer&amp;#39; was built under R version 4.</description>
+    </item>
+    
+    <item>
+      <title>Blog Post 1 Gerrymandering: Tensions of Vote Share and Seat Share</title>
       <link>http://example.org/post/2022-09-14-test-post-1/</link>
       <pubDate>Wed, 14 Sep 2022 00:00:00 +0000</pubDate>
       

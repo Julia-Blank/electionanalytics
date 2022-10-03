@@ -1,0 +1,356 @@
+---
+title: 'Blog Post 4: Expert Prediction and Incumbency'
+author: Julia Blank
+date: '2022-10-03'
+slug: []
+categories: []
+tags: []
+---
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+# Loading in necessary libraries
+
+library(tidyverse)
+library(ggplot2)
+library(stargazer)
+library(janitor)
+library(readxl)
+
+library(tidyverse)
+library(ggplot2)
+library(blogdown)
+library(stargazer)
+library(readr)
+library(usmap)
+library(rmapshaper)
+library(sf)
+library(janitor)
+library(tigris)
+library(leaflet)
+```
+
+```{r}
+#LOAD IN REQUISITE DATA SETS
+expert_ratings <- read_csv("04-Incumbency-9-29-/Section-data/District-level-forecast/expert_rating.csv")
+historical_results <- read_csv("04-Incumbency-9-29-/Section-data/District-level-forecast/house party vote share by district 1948-2020.csv") %>%
+  clean_names()
+incumb_dist_1948_2022_2_ <- read_csv("04-Incumbency-9-29-/Section-data/incumb_dist_1948-2022 (2).csv")
+roper_cong_polls_1979_2022 <- read_csv("04-Incumbency-9-29-/roper_cong_polls_1979-2022.csv")
+```
+
+Hi everyone! We’re back this week with another set of models this time exploring the important concepts of expert prediction and incumbency. This week through building models with expert predictions and incumbency, I’ve set out to investigate: How well do experts do at explaining election outcomes on average and does incumbency have a redundant effect or add something profound to our own predictions?
+
+
+To first begin investigating this question, I explored how well expert predictions have historically predicted elections in the past. I did this by comparing the true Democratic vote Share in the 2018 midterms to the expert predictions of party victory in each district. To do this, I first started by aggregating the true democratic vote share for each district and mapping them. The states with the most vote share (above 50%) are the bluest and the states with the least democratic vote share (under 50%)  are the reddest, while the tossup states are the whitest. The map can be viewed below.
+
+
+```{r}
+
+#find data for the democrats from historical results
+democrats_2018 <- historical_results %>% 
+  select(race_year, state, area, dem_votes_major_percent, rep_votes_major_percent, rep_votes, dem_votes, rep_status, dem_status, winner_party) %>% 
+  rename("year" = "race_year") %>% 
+  filter(year == 2018) %>%
+  separate(area, into = c("area", "district"), sep = " ") %>% 
+  select(-area) %>% 
+  mutate(district = case_when(
+    district == "Large" ~ "AL",
+    TRUE ~ district
+    ))
+
+
+democrats_2018$district[is.na(democrats_2018$district)] = 1
+
+democrats_2018 <- democrats_2018 %>%
+   mutate(district = case_when(
+    district == "AL" ~ "1",
+    TRUE ~ district
+  ))
+
+#turn district from char to number
+democrats_2018$district <- as.numeric(democrats_2018$district)
+
+#grab map
+cd116 <- congressional_districts(
+  state = NULL,
+  cb = FALSE,
+  resolution = "500k",
+  year = 2018)
+
+cd116 <- cd116 %>%
+  rename("state" = "STATEFP")
+
+#load in state data to correspond numbers to names
+state <- read_csv("04-Incumbency-9-29-/Section-data/us-state.csv") %>%
+  rename(state = st)
+
+district <- cd116 %>%
+  left_join(state, by = "state")
+  
+district2 <- district %>%
+  select(-c("state")) %>%
+  rename("state" = "stname", "district" = "CD116FP", "st" = "stusps")
+
+district2$district <- as.numeric(district2$district)
+
+district2 <- district2 %>%
+  mutate(district = case_when(
+    district == 0 ~ 1,
+    TRUE ~ district
+  ))
+
+#join  naming data with democrat data
+joineddata <- district2 %>%
+  left_join(democrats_2018, by = c("state", "district"))
+
+cleaneddata <- joineddata %>%
+  filter(state != "Alaska", state != "Hawaii") %>%
+  mutate(district = case_when(
+    district == 0 ~ 1,
+    TRUE ~ district
+  )) %>%
+  ms_simplify()
+
+cleaneddata$district <- as.numeric(cleaneddata$district)
+
+#plot vote share percentage for democrats
+ggplot() + 
+  geom_sf(data=cleaneddata,aes(fill=dem_votes_major_percent),
+          inherit.aes=FALSE,alpha=0.9) + 
+  scale_fill_gradient2(low = "tomato", mid = "white",  high = "blue", limits =c(0,100), midpoint = 50, name = "Vote Share Percentage for Democrats") +
+  theme_void() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank()) +
+  labs(title = "Democratic Vote Share in 2018 Midterms")
+```
+
+
+In order to compare efficacy of expert predictions, I then created a map of how likely experts predicted each district was to go to each party.  To do so, I combined numerical ratings that expert predictors gave each district based on how likely they were to lean towards a certain partisanship. The scaled range from 1 which mean safely leaning democrat to 7 which meant it was safely lean republican. In the map below, blue is associated with lower numbers and democrats, white(4.0) with the most uncertain swing districts, and red with the highest numbers and republican victories. The image can be seen below. 
+
+```{r, expert prediction maps}
+#load in 2018 ratings data
+ratings2018 <- read_csv("04-Incumbency-9-29-/Section-data/2018_ratings_share.csv")
+
+
+#clean ratings data
+ratings2018 <- ratings2018 %>%
+  separate(District, into = c("state", "district"), sep = "-") %>%
+  filter(state != "Alaska", state != "Hawaii") %>%
+  rename("st" = "state") %>%
+  select(st, district, avg)
+
+#change districts to numbers so join works
+ratings2018$district <- as.numeric(ratings2018$district)
+
+joinedratings <- ratings2018 %>%
+  left_join(cleaneddata, by = c("st", "district")) %>% 
+  st_as_sf()
+
+
+#make map of predicted vote share from experts
+ggplot() + 
+  geom_sf(data=joinedratings, aes(fill=avg),
+          inherit.aes=FALSE,alpha=0.9) + 
+  scale_fill_gradient2(low = "dodger blue", mid = "white",  high = "red", limits=c(1, 7), midpoint = 4, name ="Expert Prediction\n1 = Safely Democrat\n7 = Safely Republican") +
+  labs(title = "Predicted Democratic Vote Share in 2018 Midterms") +
+  theme_void() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
+```
+Comparing the two images, it appears that experts were incredibly accurate at predicting which way districts were going to swing and event the degree to which how large the voting share would be. From the images, the degree of certainty to which experts predicted a state would lean one way or another directly correlated to how far the democratic vote share percentage veered from 50%. The only routine differences I see between the expert predictions and vote share percentage in actuality is that it appears in districts that vote share was more favorable to democrats in regions that experts thought would lean slightly more republican. 
+
+Now that we’ve established that expert predictions in aggregate are quite close to the actual vote share percentage exhibited in historical elections, it is time to see how strong of a predictor they really are. As well as, how might incumbency play a role in our predictions as well. 
+
+Before we get into the nitty gritty of the models, let’s recap that incumbency is one of the most fundamental and talked about variables that go into election predictions. But for those who don’t avidly read Nate Silver’s every tweet, you may be wondering why? So let’s first break this down.
+
+Incumbency is typically seen as an advantage but the label of being an incumbent itself isn’t necessarily the key determinant of winning on its own, rather it is the meaning behind what having held office before. Being an incumbent can lead to an advantage due to name recognition alone, but also if a candidate is viewed to have done a good job whether it be ensuring economic success or passing favorable legislation for their district. However, poor performance or coincidental measures of performance like the economy may have profoundly negative effects. As such, incumbency itself may not represent the whole picture of an electoral outcome. 
+
+Building off of last week's models, I recognized that the economic variables of performance used were not good at explaining the variation in two party vote share in an election. As such, I decided to drop this variable from my model altogether. In addition, since I knew I was bringing in expert predictions, and understood that these predictions incorporate polling heavily, I decided to throw out the general poll variable as well. As such, this week I decided to test two models: one with just average expert ratings and another with average expert ratings and incumbency. To start, (due to technical difficulties) I created one model that looks only at democrats. I'm trying to look at how democratic vote share is impacted by whether a democrat is an incumbent or not. For democrats only, the relationship between incumbency and vote shore 
+
+```{r}
+# Selecting columns
+avg_ratings <- expert_ratings %>% 
+  select(year, state, district, avg_rating)
+
+
+historical_results_clean <- historical_results %>%
+  mutate(dem_status = case_when(dem_status == "Incumbent" ~ 1,
+                               TRUE ~ 0),
+         rep_status = case_when(rep_status == "Incumbent" ~ 1,
+                               TRUE ~ 0))
+  
+dem_results <- historical_results_clean %>% 
+  select(race_year, state, area, dem_votes_major_percent, dem_status) %>% 
+  rename("year" = "race_year") %>% 
+  separate(area, into = c("area", "district"), sep = " ") %>% 
+  select(-area) %>% 
+  mutate(district = case_when(
+    district == "Large" ~ "AL",
+    TRUE ~ district
+  ))
+
+#rep_results <- historical_results_clean %>% 
+ # select(race_year, state, area, rep_votes_major_percent, rep_status) %>% 
+ # rename("year" = "race_year") %>% 
+  #separate(area, into = c("area", "district"), sep = " ") %>% 
+  #select(-area) %>% 
+ # mutate(district = case_when(
+  #  district == "Large" ~ "AL",
+ #   TRUE ~ district
+  #))
+
+
+# Joining the data and nesting by state and district
+train_data_dem <- avg_ratings %>% 
+  filter(year != 2022) %>% 
+  # left join as there aren't ratings for every district
+  left_join(dem_results, by = c("year", "state", "district")) %>% 
+  group_by(state, district) %>% 
+  filter(n() > 1) %>% # Filtering out single data rows
+  group_nest() %>% 
+  mutate(data = map(data, ~unnest(., cols = c())))
+
+
+#train_data_rep <- avg_ratings %>% 
+  #filter(year != 2022) %>% 
+  # left join as there aren't ratings for every district
+ # left_join(rep_results, by = c("year", "state", "district")) %>% 
+  #group_by(state, district) %>% 
+ # filter(n() > 1) %>% # Filtering out single data rows
+ # group_nest() %>% 
+  #mutate(data = map(data, ~unnest(., cols = c())))
+
+```
+
+```{r}
+#run democrat and republican model on respective training dataset
+modelsdem <- train_data_dem %>% 
+  mutate(modeldem = map(data, ~lm(dem_votes_major_percent ~ avg_rating + dem_status, 
+                                  data = .x))) %>%
+  select(-data)
+
+modelsnoincumbent <- train_data_dem %>% 
+  mutate(modelnoincumb = map(data, ~lm(dem_votes_major_percent ~ avg_rating, 
+                                  data = .x))) %>%
+  select(-data)
+##modelsrep <- train_data_rep %>% 
+  ##mutate(modelrep = map(data, ~lm(rep_votes_major_percent ~ avg_rating + rep_status, 
+                                 ## data = .x))) %>%
+  ##select(-data)
+
+model_results_dem <- modelsdem %>% 
+  mutate(r_squared = map_dbl(modeldem, ~summary(.x)$r.squared))
+
+
+
+modelsnoincumbent_results <- modelsnoincumbent %>% 
+  mutate(r_squared = map_dbl(modelnoincumb, ~summary(.x)$r.squared))
+##model_results_rep <- modelsrep %>% 
+ ## mutate(r_squared = map_dbl(modelrep, ~summary(.x)$r.squared))
+
+```
+
+The first model predicts democratic vote share based upon average expert ratings and incumbency. After training it on historical data for each district, the model predicted that among all districts nationally that democrats in 2022 would win yielded on average for all districts an r^2 value of  0.7814, which is the highest of all my models thus far. This says that combining expert predictions and incumbency is a promising way of explaining variation in democratic vote share percentage in an election. 
+
+```{r}
+#creating testdata
+
+test2022attempt <- avg_ratings %>%
+  mutate(dem_status = 1)
+
+test_data <- test2022attempt %>% 
+  filter(year == 2022) %>% 
+  group_by(state, district) %>% 
+  group_nest() %>% 
+  mutate(datad = map(data, ~unnest(., cols = c())))
+
+#predictions 2022 for models dem with incumbent
+pred_2022 <- test_data %>%
+  # inner join as there may not be historical models for some districts
+  inner_join(modelsdem, by = c("state", "district")) %>% 
+  mutate(pred = map_dbl(.x = modeldem, .y = datad, ~predict(object = .x, newdata = as.data.frame(.y)))) %>%
+  select(state, district, pred)
+
+#print(pred_2022)
+
+## NUMBER OF DISTRICTS DEMS PREDICTED TO WIN VOTE SHARE
+numofdistricts <- pred_2022 %>%
+  mutate(demwin = case_when(pred>=50 ~ 1,
+                            TRUE ~0
+  )) %>%
+  summarise(sum(demwin)/94)
+
+
+##AVERAGE prediction for dem vote share
+averagepred <- pred_2022 %>%
+  summarize(mean(pred)) %>% pull
+
+
+##AVERAGE R2 for w/ incumbency
+
+r2average <- model_results_dem %>%
+  summarize(mean(r_squared))
+  
+```
+
+```{r}
+#predictions for models no incumbent
+
+#predictions 2022 for models dem with incumbent
+pred_2022_noincumb <- test_data %>%
+  # inner join as there may not be historical models for some districts
+  inner_join(modelsnoincumbent, by = c("state", "district")) %>% 
+  mutate(pred = map_dbl(.x = modelnoincumb, .y = datad, ~predict(object = .x, newdata = as.data.frame(.y)))) %>%
+  select(state, district, pred)
+
+#print(pred_2022_noincumb)
+
+## NUMBER OF DISTRICTS DEMS PREDICTED TO WIN VOTE SHARE
+numofdistricts <- pred_2022 %>%
+  mutate(demwin = case_when(pred>=50 ~ 1,
+                            TRUE ~0
+  )) %>%
+  summarise(sum(demwin)/94)
+
+
+##AVERAGE prediction for dem vote share
+averagepred <- pred_2022 %>%
+  summarize(mean(pred)) %>% pull
+
+##AVERAGE R2 for w/ incumbency
+
+r2average <- modelsnoincumbent_results %>%
+  summarize(mean(r_squared))
+```
+
+
+```{r}
+#looking at my district specifically in both models
+
+p8incumb <- model_results_dem %>%
+  filter(state == "Pennsylvania", district == "8")## %>%
+  ##unnest()
+
+p8noincumb <- modelsnoincumbent_results %>%
+  filter(state == "Pennsylvania", district == "8") ##%>%
+ ## unnest()
+
+stargazer(p8incumb$modeldem, p8noincumb$modelnoincumb, type = "text")
+#p8 <- p8$model[,1]
+
+#predict(p8, data.frame(avg_rating  = 4, dem_status = 1))
+```
+
+
+
+CITATIONS: 
+Campbell, J. E., & Mann, T. E. (2016, July 28). Forecasting the presidential election: What can we learn from the models? Brookings. Retrieved October 3, 2022, from https://www.brookings.edu/articles/forecasting-the-presidential-election-what-can-we-learn-from-the-models/

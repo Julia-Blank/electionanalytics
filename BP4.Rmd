@@ -1,0 +1,420 @@
+---
+title: "Incumbency Presentation"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+# Loading in necessary libraries
+
+library(tidyverse)
+library(ggplot2)
+library(stargazer)
+library(janitor)
+library(readxl)
+
+library(tidyverse)
+library(ggplot2)
+library(blogdown)
+library(stargazer)
+library(readr)
+library(usmap)
+library(rmapshaper)
+library(sf)
+library(janitor)
+library(tigris)
+library(leaflet)
+```
+
+
+```{r}
+#LOAD IN REQUISITE DATA SETS
+dist_polls_2018_2022 <- read_csv("Section data/dist_polls_2018-2022.csv")
+expert_ratings <- read_csv("Section data/District level forecast/expert_rating.csv")
+historical_results <- read_csv("Section data/District level forecast/house party vote share by district 1948-2020.csv") %>% 
+  clean_names()
+incumb_dist_1948_2022_2_ <- read_csv("Section data/incumb_dist_1948-2022 (2).csv")
+roper_cong_polls_1979_2022 <- read_csv("roper_cong_polls_1979-2022.csv")
+```
+
+
+```{r, extension map 1}
+
+#find data for the democrats from historical results
+democrats_2018 <- historical_results %>% 
+  select(race_year, state, area, dem_votes_major_percent, rep_votes_major_percent, rep_votes, dem_votes, rep_status, dem_status, winner_party) %>% 
+  rename("year" = "race_year") %>% 
+  filter(year == 2018) %>%
+  separate(area, into = c("area", "district"), sep = " ") %>% 
+  select(-area) %>% 
+  mutate(district = case_when(
+    district == "Large" ~ "AL",
+    TRUE ~ district
+    ))
+
+
+democrats_2018$district[is.na(democrats_2018$district)] = 1
+
+democrats_2018 <- democrats_2018 %>%
+   mutate(district = case_when(
+    district == "AL" ~ "1",
+    TRUE ~ district
+  ))
+
+#turn district from char to number
+democrats_2018$district <- as.numeric(democrats_2018$district)
+
+#grab map
+cd116 <- congressional_districts(
+  state = NULL,
+  cb = FALSE,
+  resolution = "500k",
+  year = 2018)
+
+cd116 <- cd116 %>%
+  rename("state" = "STATEFP")
+
+#load in state data to correspond numbers to names
+state <- read_csv("Section data/us-state.csv") %>%
+  rename(state = st)
+
+district <- cd116 %>%
+  left_join(state, by = "state")
+  
+district2 <- district %>%
+  select(-c("state")) %>%
+  rename("state" = "stname", "district" = "CD116FP", "st" = "stusps")
+
+district2$district <- as.numeric(district2$district)
+
+district2 <- district2 %>%
+  mutate(district = case_when(
+    district == 0 ~ 1,
+    TRUE ~ district
+  ))
+
+#join district level naming data with democrat data
+joineddata <- district2 %>%
+  left_join(democrats_2018, by = c("state", "district"))
+
+cleaneddata <- joineddata %>%
+  filter(state != "Alaska", state != "Hawaii") %>%
+  mutate(district = case_when(
+    district == 0 ~ 1,
+    TRUE ~ district
+  )) %>%
+  ms_simplify()
+
+cleaneddata$district <- as.numeric(cleaneddata$district)
+
+#plot vote share percentage for democrats
+ggplot() + 
+  geom_sf(data=cleaneddata,aes(fill=dem_votes_major_percent),
+          inherit.aes=FALSE,alpha=0.9) + 
+  scale_fill_gradient2(low = "tomato", mid = "white",  high = "blue", limits =c(0,100), midpoint = 50, name = "Vote Share Percentage for Democrats") +
+  #scale_fill_gradient(low = "white", high = "dodger blue", limits=c(0,100), name = "Vote Share Percentage") +
+  theme_void() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank()) +
+  labs(title = "Democratic Vote Share in 2018 Midterms")
+```
+
+
+```{r, expert prediction maps}
+#load in 2018 ratings data
+ratings2018 <- read_csv("Section data/2018_ratings_share.csv")
+
+
+#clean ratings data
+ratings2018 <- ratings2018 %>%
+  separate(District, into = c("state", "district"), sep = "-") %>%
+  filter(state != "Alaska", state != "Hawaii") %>%
+  rename("st" = "state") %>%
+  select(st, district, avg)
+
+#change districts to numbers so join works
+ratings2018$district <- as.numeric(ratings2018$district)
+
+joinedratings <- ratings2018 %>%
+  left_join(simpdata, by = c("st", "district")) %>% 
+  st_as_sf()
+
+
+#make map of predicted vote share from experts
+ggplot() + 
+  geom_sf(data=joinedratings, aes(fill=avg),
+          inherit.aes=FALSE,alpha=0.9) + 
+  scale_fill_gradient2(low = "dodger blue", mid = "white",  high = "red", limits=c(1, 7), midpoint = 4, name ="Expert Prediction\n1 = Safely Democrat\n7 = Safely Republican") +
+  labs(title = "Predicted Democratic Vote Share in 2018 Midterms") +
+  theme_void() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
+```
+
+
+```{r}
+#roper_cong_polls_1979_2022 <- read_csv("roper_cong_polls_1979-2022.csv")
+
+
+#congress_approval <- roper_cong_polls_1979_2022 
+
+#congress_approval$ReleaseDate <-  format(as.Date(congress_approval$ReleaseDate, format="%d/%m/%Y"),"%Y")
+  
+#congress_approval %>%
+  #pivot_wider(names_from = RespTxt, 
+    #          values_from = c(RespPct))
+  ## create a real year
+  
+  ##PIVOT WIDE 
+  
+  ##raw relationship of approval rating
+  
+  ##ONLY IN MIDTERM YEARS or ELECTION YEARS
+  
+  ##EACH INDIVIDUAL OBSERVATION HAS APPORVAL RATING 
+```
+
+
+
+```{r}
+Candidates2022 <- read_excel("ConCand7_2021_6m.xlsx") %>%
+  filter(!row_number() %in% c(1, 2, 3))
+
+names(Candidates2022) <- Candidates2022[1,]
+
+Candidates2022 <- Candidates2022[-1,]
+
+Candidates2022 <- Candidates2022 %>%
+  ##filter(Party != "Independent") %>%
+  rename(state = State, district = District) %>%
+  group_by##%>%
+  ##rename(Incumbent = `Incumbent/Challenger/Open`)
+  ##mutate(dem_status = case_when(party == "Democratic Party" and 	`Incumbent/Challenger/Open` == "Incumbent" ) )
+
+test2022attempt <- avg_ratings %>%
+  mutate(dem_status = 1)
+
+test_data <- test2022attempt %>% 
+  filter(year == 2022) %>% 
+  group_by(state, district) %>% 
+  group_nest() %>% 
+  mutate(data = map(data, ~unnest(., cols = c())))
+
+```
+
+
+```{r, cleaningdata}
+# Selecting columns
+avg_ratings <- expert_ratings %>% 
+  select(year, state, district, avg_rating)
+
+
+historical_results_clean <- historical_results %>%
+  mutate(dem_status = case_when(dem_status == "Incumbent" ~ 1,
+                               TRUE ~ 0),
+         rep_status = case_when(rep_status == "Incumbent" ~ 1,
+                               TRUE ~ 0))
+  
+dem_results <- historical_results_clean %>% 
+  select(race_year, state, area, dem_votes_major_percent, dem_status) %>% 
+  rename("year" = "race_year") %>% 
+  separate(area, into = c("area", "district"), sep = " ") %>% 
+  select(-area) %>% 
+  mutate(district = case_when(
+    district == "Large" ~ "AL",
+    TRUE ~ district
+  ))
+
+#rep_results <- historical_results_clean %>% 
+ # select(race_year, state, area, rep_votes_major_percent, rep_status) %>% 
+ # rename("year" = "race_year") %>% 
+  #separate(area, into = c("area", "district"), sep = " ") %>% 
+  #select(-area) %>% 
+ # mutate(district = case_when(
+  #  district == "Large" ~ "AL",
+ #   TRUE ~ district
+  #))
+
+
+# Joining the data and nesting by state and district
+train_data_dem <- avg_ratings %>% 
+  filter(year != 2022) %>% 
+  # left join as there aren't ratings for every district
+  left_join(dem_results, by = c("year", "state", "district")) %>% 
+  group_by(state, district) %>% 
+  filter(n() > 1) %>% # Filtering out single data rows
+  group_nest() %>% 
+  mutate(data = map(data, ~unnest(., cols = c())))
+
+
+#train_data_rep <- avg_ratings %>% 
+  #filter(year != 2022) %>% 
+  # left join as there aren't ratings for every district
+ # left_join(rep_results, by = c("year", "state", "district")) %>% 
+  #group_by(state, district) %>% 
+ # filter(n() > 1) %>% # Filtering out single data rows
+ # group_nest() %>% 
+  #mutate(data = map(data, ~unnest(., cols = c())))
+
+
+```
+
+```{r}
+
+#run democrat and republican model on respective training dataset
+modelsdem <- train_data_dem %>% 
+  mutate(modeldem = map(data, ~lm(dem_votes_major_percent ~ avg_rating + dem_status, 
+                                  data = .x))) %>%
+  select(-data)
+
+modelsnoincumbent <- train_data_dem %>% 
+  mutate(modelnoincumb = map(data, ~lm(dem_votes_major_percent ~ avg_rating, 
+                                  data = .x))) %>%
+  select(-data)
+##modelsrep <- train_data_rep %>% 
+  ##mutate(modelrep = map(data, ~lm(rep_votes_major_percent ~ avg_rating + rep_status, 
+                                 ## data = .x))) %>%
+  ##select(-data)
+
+model_results_dem <- modelsdem %>% 
+  mutate(r_squared = map_dbl(modeldem, ~summary(.x)$r.squared))
+
+
+
+modelsnoincumbent_results <- modelsnoincumbent %>% 
+  mutate(r_squared = map_dbl(modelnoincumb, ~summary(.x)$r.squared))
+##model_results_rep <- modelsrep %>% 
+ ## mutate(r_squared = map_dbl(modelrep, ~summary(.x)$r.squared))
+
+
+```
+
+```{r}
+
+#creating testdata
+
+test2022attempt <- avg_ratings %>%
+  mutate(dem_status = 1)
+
+test_data <- test2022attempt %>% 
+  filter(year == 2022) %>% 
+  group_by(state, district) %>% 
+  group_nest() %>% 
+  mutate(datad = map(data, ~unnest(., cols = c())))
+
+#predictions 2022 for models dem with incumbent
+pred_2022 <- test_data %>%
+  # inner join as there may not be historical models for some districts
+  inner_join(modelsdem, by = c("state", "district")) %>% 
+  mutate(pred = map_dbl(.x = modeldem, .y = datad, ~predict(object = .x, newdata = as.data.frame(.y)))) %>%
+  select(state, district, pred)
+
+print(pred_2022)
+
+## NUMBER OF DISTRICTS DEMS PREDICTED TO WIN VOTE SHARE
+numofdistricts <- pred_2022 %>%
+  mutate(demwin = case_when(pred>=50 ~ 1,
+                            TRUE ~0
+  )) %>%
+  summarise(sum(demwin)/94)
+
+
+##AVERAGE prediction for dem vote share
+averagepred <- pred_2022 %>%
+  summarize(mean(pred)) %>% pull
+
+
+##AVERAGE R2 for w/ incumbency
+
+r2average <- model_results_dem %>%
+  summarize(mean(r_squared))
+  
+
+```
+
+```{r}
+#predictions for models no incumbent
+
+#predictions 2022 for models dem with incumbent
+pred_2022_noincumb <- test_data %>%
+  # inner join as there may not be historical models for some districts
+  inner_join(modelsnoincumbent, by = c("state", "district")) %>% 
+  mutate(pred = map_dbl(.x = modelnoincumb, .y = datad, ~predict(object = .x, newdata = as.data.frame(.y)))) %>%
+  select(state, district, pred)
+
+print(pred_2022_noincumb)
+
+## NUMBER OF DISTRICTS DEMS PREDICTED TO WIN VOTE SHARE
+numofdistricts <- pred_2022 %>%
+  mutate(demwin = case_when(pred>=50 ~ 1,
+                            TRUE ~0
+  )) %>%
+  summarise(sum(demwin)/94)
+
+
+##AVERAGE prediction for dem vote share
+averagepred <- pred_2022 %>%
+  summarize(mean(pred)) %>% pull
+
+##AVERAGE R2 for w/ incumbency
+
+r2average <- modelsnoincumbent_results %>%
+  summarize(mean(r_squared))
+```
+
+
+
+(take average prediction)
+
+(talk about my district)
+
+
+```{r}
+##OUT OF SAMPLE train
+
+#train_data <- avg_ratings %>% 
+ # filter(year != 2022, 2016) %>% 
+  ## left join as there aren't ratings for every district
+  #left_join(dem_results, by = c("year", "state", "district")) %>% 
+  #group_by(state, district) %>% 
+  #filter(n() > 1) %>% # Filtering out single data rows
+  #group_nest() %>% 
+  #mutate(data = map(data, ~unnest(., cols = c())))
+
+#- exclude years 2016
+
+#- 
+
+
+```
+
+
+```{r}
+
+p8incumb <- model_results_dem %>%
+  filter(state == "Pennsylvania", district == "8")## %>%
+  ##unnest()
+
+p8noincumb <- modelsnoincumbent_results %>%
+  filter(state == "Pennsylvania", district == "8") ##%>%
+ ## unnest()
+
+stargazer(p8incumb$modeldem, p8noincumb$modelnoincumb, type = "text")
+#p8 <- p8$model[,1]
+
+#predict(p8, data.frame(avg_rating  = 4, dem_status = 1))
+
+```
+
