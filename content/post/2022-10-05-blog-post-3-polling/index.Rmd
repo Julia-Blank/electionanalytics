@@ -17,7 +17,7 @@ Morris takes a different approach to Silver with the Economist’s forecasting m
 Overall, I think I slightly prefer Silver’s mode of analysis, particularly because I think it can help us uncover what factors are influential in predicting election outcomes. The iterative process that he takes, using one model that just builds upon itself with more and more factors, allows us to evaluate which factors add more serious improvements by looking at the margin. Additionally, I think the CANTOR strategy of matching districts and data imputation is very helpful for areas where data is sparse. Despite my preference for Fivethirtyeight’s model, I do feel that it runs the risk of overfitting as it adds on more and more factors. 
 
 ```{r,echo = FALSE, warning = FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE) 
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, options(warn=-1)) 
 # Loading in necessary libraries
 
 library(tidyverse)
