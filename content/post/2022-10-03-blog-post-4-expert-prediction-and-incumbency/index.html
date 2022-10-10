@@ -58,6 +58,8 @@ tags: []
   |                                                                            
   |====                                                                  |   6%
   |                                                                            
+  |=====                                                                 |   6%
+  |                                                                            
   |=====                                                                 |   7%
   |                                                                            
   |=====                                                                 |   8%
@@ -80,6 +82,8 @@ tags: []
   |                                                                            
   |=========                                                             |  13%
   |                                                                            
+  |=========                                                             |  14%
+  |                                                                            
   |==========                                                            |  14%
   |                                                                            
   |==========                                                            |  15%
@@ -87,8 +91,6 @@ tags: []
   |===========                                                           |  15%
   |                                                                            
   |===========                                                           |  16%
-  |                                                                            
-  |============                                                          |  16%
   |                                                                            
   |============                                                          |  17%
   |                                                                            
@@ -106,8 +108,6 @@ tags: []
   |                                                                            
   |===============                                                       |  21%
   |                                                                            
-  |===============                                                       |  22%
-  |                                                                            
   |================                                                      |  22%
   |                                                                            
   |================                                                      |  23%
@@ -122,11 +122,15 @@ tags: []
   |                                                                            
   |==================                                                    |  26%
   |                                                                            
+  |===================                                                   |  26%
+  |                                                                            
   |===================                                                   |  27%
   |                                                                            
   |===================                                                   |  28%
   |                                                                            
   |====================                                                  |  28%
+  |                                                                            
+  |====================                                                  |  29%
   |                                                                            
   |=====================                                                 |  29%
   |                                                                            
@@ -162,6 +166,8 @@ tags: []
   |                                                                            
   |===========================                                           |  39%
   |                                                                            
+  |============================                                          |  39%
+  |                                                                            
   |============================                                          |  40%
   |                                                                            
   |============================                                          |  41%
@@ -181,18 +187,6 @@ tags: []
   |================================                                      |  45%
   |                                                                            
   |================================                                      |  46%
-  |                                                                            
-  |=================================                                     |  46%
-  |                                                                            
-  |=================================                                     |  47%
-  |                                                                            
-  |=================================                                     |  48%
-  |                                                                            
-  |==================================                                    |  48%
-  |                                                                            
-  |==================================                                    |  49%
-  |                                                                            
-  |===================================                                   |  49%
   |                                                                            
   |===================================                                   |  50%
   |                                                                            
@@ -220,6 +214,14 @@ tags: []
   |                                                                            
   |========================================                              |  57%
   |                                                                            
+  |========================================                              |  58%
+  |                                                                            
+  |=========================================                             |  58%
+  |                                                                            
+  |=========================================                             |  59%
+  |                                                                            
+  |==========================================                            |  59%
+  |                                                                            
   |==========================================                            |  60%
   |                                                                            
   |==========================================                            |  61%
@@ -231,8 +233,6 @@ tags: []
   |============================================                          |  62%
   |                                                                            
   |============================================                          |  63%
-  |                                                                            
-  |============================================                          |  64%
   |                                                                            
   |=============================================                         |  64%
   |                                                                            
@@ -358,7 +358,7 @@ tags: []
   |                                                                            
   |======================================================================| 100%</code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
-<p>In order to compare efficacy of expert predictions, I then created a map of how likely experts predicted each district was to go to each party. To do so, I combined numerical ratings that expert predictors gave each district based on how likely they were to lean towards a certain partisanship. The scaled range from 1 which mean safely leaning democrat to 7 which meant it was safely lean republican. In the map below, blue is associated with lower numbers and democrats, white(4.0) with the most uncertain swing districts, and red with the highest numbers and republican victories. The image can be seen below.</p>
+<p>In order to compare efficacy of expert predictions, I then created a map of how likely experts predicted each district was to go to each party. To do so, I combined numerical ratings that expert predictors gave each district based on how likely they were to lean towards a certain partisanship. The scaled range from 1 which mean safely leaning democrat to 7 which meant it was safely lean republican.In the map below, blue is associated with lower numbers and democrats, white(4.0) with the most uncertain swing districts, and red with the highest numbers and republican victories. The image can be seen below.</p>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/expert%20prediction%20maps-1.png" width="672" />
 Comparing the two images, it appears that experts were incredibly accurate at predicting which way districts were going to swing and event the degree to which how large the voting share would be. From the images, the degree of certainty to which experts predicted a state would lean one way or another directly correlated to how far the democratic vote share percentage veered from 50%. The only routine differences I see between the expert predictions and vote share percentage in actuality is that it appears in districts that vote share was more favorable to democrats in regions that experts thought would lean slightly more republican.</p>
 <p>Now that we’ve established that expert predictions in aggregate are quite close to the actual vote share percentage exhibited in historical elections, it is time to see how strong of a predictor they really are. As well as, how might incumbency play a role in our predictions as well.</p>
@@ -366,6 +366,12 @@ Comparing the two images, it appears that experts were incredibly accurate at pr
 <p>Incumbency is typically seen as an advantage but the label of being an incumbent itself isn’t necessarily the key determinant of winning on its own, rather it is the meaning behind what having held office before. Being an incumbent can lead to an advantage due to name recognition alone, but also if a candidate is viewed to have done a good job whether it be ensuring economic success or passing favorable legislation for their district. However, poor performance or coincidental measures of performance like the economy may have profoundly negative effects. As such, incumbency itself may not represent the whole picture of an electoral outcome.</p>
 <p>Building off of last week’s models, I recognized that the economic variables of performance used were not good at explaining the variation in two party vote share in an election. As such, I decided to drop this variable from my model altogether. In addition, since I knew I was bringing in expert predictions, and understood that these predictions incorporate polling heavily, I decided to throw out the general poll variable as well. As such, this week I decided to test two models: one with just average expert ratings and another with average expert ratings and incumbency. To start, (due to technical difficulties) I created one model that looks only at democrats. I’m trying to look at how democratic vote share is impacted by whether a democrat is an incumbent or not. For democrats only, the relationship between incumbency and vote shore</p>
 <p>The first model predicts democratic vote share based upon average expert ratings and incumbency. After training it on historical data for each district, the model predicted that among all districts nationally that democrats in 2022 would win yielded on average for all districts an r^2 value of 0.7814, which is the highest of all my models thus far. This says that combining expert predictions and incumbency is a promising way of explaining variation in democratic vote share percentage in an election.</p>
+<p><span class="math display">\[
+Democratic Vote Share = Average Expert Prediction
+\]</span></p>
+<p>$$
+Democratic Vote Share = Average Expert Prediction + IncumbentPresident</p>
+<p>$$</p>
 <pre><code>## 
 ## ==============================================================
 ##                                Dependent variable:            

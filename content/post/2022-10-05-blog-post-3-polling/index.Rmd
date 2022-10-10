@@ -1,0 +1,224 @@
+---
+title: 'Blog Post 3: Polling'
+author: ''
+date: '2022-09-25'
+output: pdf_document
+categories: []
+tags: []
+slug: []
+---
+
+Hi everyone! Welcome back to my election analytics blog. While last week we were looking at purely economic factors, this week I am turning our attentions to the power of the poll and it's role in predicting election outcomes. 
+
+Nate Silver crafts Fivethirtyeight’s election prediction in 2022 by creating 3 versions of one model: the lite, classic, and deluxe models. Each version of the model builds upon each other iterratively in complexity. The Lite model is simply a polls only forecast but includes an adjustment system called CANTOR which matches districts that don’t have data to districts that are similar in demographic. This solves the problem that often happens with  district level forecasts which is that there is simply not enough data collected on many districts. The next version Silver utilizes is the Classic model which adds in both polling factors but also fundamentals like past election results, partisanship, and financing. Finally, the Deluxe models maintains both the polling data and fundamentals forecast but also includes other expert predictions. With each version of the model building off each other, Silver sets up a strong foundation for comparing his own models and the various factors that each take into account. Interestingly, performance among the three models doesn’t differ that drastically. 
+
+Morris takes a different approach to Silver with the Economist’s forecasting model mainly focused on the generic ballot. While Silver emphasizes the use of polls in his model, Morris believes in the power of the generic ballot fully and centers his forecast around this indicator. Only then does he incorporate polls to make small adjustments to the forecast. In addition, similar to Silver, Morris accounts for fundamentals like “incumbency and each district’s partisan lean” to create a fuller picture of the race.
+
+Overall, I think I slightly prefer Silver’s mode of analysis, particularly because I think it can help us uncover what factors are influential in predicting election outcomes. The iterative process that he takes, using one model that just builds upon itself with more and more factors, allows us to evaluate which factors add more serious improvements by looking at the margin. Additionally, I think the CANTOR strategy of matching districts and data imputation is very helpful for areas where data is sparse. Despite my preference for Fivethirtyeight’s model, I do feel that it runs the risk of overfitting as it adds on more and more factors. 
+
+```{r,echo = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE) 
+# Loading in necessary libraries
+
+library(tidyverse)
+library(ggplot2)
+library(stargazer)
+library(janitor)
+library(readxl)
+
+library(tidyverse)
+library(ggplot2)
+library(blogdown)
+library(stargazer)
+library(readr)
+library(usmap)
+library(rmapshaper)
+library(sf)
+library(janitor)
+library(tigris)
+library(leaflet)
+```
+
+
+```{r}
+popvote <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/Economic Section data/house_popvote_seats.csv")
+
+pollsdata <- read_csv("~/Documents/GOV 50 PROJECTS/electionanalytics/03-Polling (9-22)/section data/polls_df.csv")
+RDI_quarterly <- read_csv("~/Documents/GOV 50 PROJECTS/electionanalytics/Economic Section data/RDI_quarterly.csv") 
+
+
+pres_approval<- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/03-Polling (9-22)/section data/Other polling data/pres_approval_gallup_1941-2022.csv")
+
+
+generic_averages_22 = read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/03-Polling (9-22)/section data/538_generic_poll_2022.csv")
+
+genericballotavg18_22 = read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/03-Polling (9-22)/section data/538_generic_ballot_averages_2018-2022.csv")
+```
+Now, in constructing my own model this week, I aimed to answer the question: What facets of our political environment are good predictors of election outcomes? More specifically, I focused on the impact of polls and the economy on predictive electoral models. To start, I cleaned data sets that displayed quarterly percent change in disposable income and general nationwide polling data. From there, I subset the data in two sets: one for democrats and one for republics. From there, to test out the impact of various factors in my model I designed for models to test. The first model included just percent change in disposable income quarterly and analysed it's predicitve power on party vote share. The second model I made included exclusively polling data to predict each party's vote share. The third model I made incorporated both the RDI data and polling to jointly predict party vote share. And finally, I created a model that included both RDI data, polling data, and a dummy variable for midterm elections. The results of the models for democrats and republicans can be seen in the two tables below. 
+
+```{r}
+
+popvote <- popvote %>%
+  rename(Year = year)
+
+pollsdata <- pollsdata %>%
+  filter(days_until_election<70) %>%
+  group_by(year, party) %>%
+  summarise(avgsupport=mean(support)) %>%
+  rename(Year = year)
+
+
+RDI_quarterly <- RDI_quarterly %>%
+  filter(quarter_cycle == 7) %>%
+  select('year', "DSPIC_change_pct", 'quarter_cycle') %>%
+  rename(Year = year)
+
+alldata <- popvote %>%
+  full_join(pollsdata) %>%
+  left_join(RDI_quarterly) %>%
+  group_by(Year) %>%
+  drop_na()
+  
+alldata_dem <-  alldata %>%
+  filter(party== 'D') %>% 
+  mutate(midterm = ifelse(Year %% 4, 1, 0))
+
+alldata_rep <- alldata %>%
+  filter(party== 'R') %>% 
+  mutate(midterm = ifelse(Year %% 4, 1, 0))
+
+```
+```{r, dem models}
+rdi_d <- lm(D_majorvote_pct ~ DSPIC_change_pct , alldata_dem)
+
+pollsonly_d <- lm(D_majorvote_pct ~ avgsupport, alldata_dem)
+
+fundamentals_d <- lm(D_majorvote_pct ~ avgsupport + DSPIC_change_pct , alldata_dem)
+
+midtermfundamentals_d <- lm(D_majorvote_pct ~ avgsupport + DSPIC_change_pct + midterm, alldata_dem)
+
+stargazer(rdi_d, pollsonly_d, fundamentals_d, midtermfundamentals_d, type = "text",  title="Fundamentals Regression Results",
+          dep.var.labels = "Democratic Vote Percentage",
+          column.labels	= c("RDI", "Polls", "Polls + Fundamentals", "Midterm Fundamentals"),
+          covariate.labels = c("% Change in RDI", "Midterm", "Average Poll Support"))
+
+
+
+```
+
+```{r, rep_models}
+rdi_r <- lm(R_majorvote_pct ~ DSPIC_change_pct , alldata_rep)
+
+pollsonly_r <- lm(R_majorvote_pct ~ avgsupport, alldata_rep)
+
+fundamentals_r <- lm(R_majorvote_pct ~ avgsupport + DSPIC_change_pct , alldata_rep)
+
+midtermfundamentals_r <- lm(R_majorvote_pct ~ avgsupport + DSPIC_change_pct + midterm, alldata_rep)
+
+stargazer(rdi_r, pollsonly_r, fundamentals_r, midtermfundamentals_r, type = "text",  title="Fundamentals Regression Results", dep.var.labels = "Republican Vote Percentage",
+          column.labels	= c("RDI", "Polls", "Polls + Fundamentals", "Midterm Fundamentals"),
+          covariate.labels = c("% Change in RDI", "Midterm", "Average Poll Support"))
+```
+Looking at the covariates in the many models, across both republican and dmeocrat vote percentage predictions, the average poll support variable seems to be a very strong predictor. With a p-value less than 0.01, I can confidently say that I will want to include this statistical significant variable in my models in the future. However, consistent with my findings last week, the actual economic conditions don't seem to be a strong predictor of a party's vote percentage. Looking at change in RDI, it's p values are still quite large and it doesn't seem to be a truly statistically significant predictor.  
+
+As can be seen in the regression outputs, the model with polls+fundamentals has the highest predictive power in predicting the republican vote percentage, however the polls only model has the highest predictive power in predicting the democratic vote percentage. This can be seen by looking at the greatest adjusted r^2 value among all the models for a given outcome variable. Interestingly across all the models for both republican and democrat vote percentage, the models had higher predictive power for the republican vote percentage than the democrat vote percentage, which can be seen in the significantly larger adjusted r^2 values seen in the models for republican vote percentage. Also, looking below at the graph of the residuals for the various models, the republican data seems to fit the regression lines of best fit more closely. 
+
+
+```{r, insample fit}
+#rdi 
+#mean(abs(rdi_d$residuals))
+#mean(abs(rdi_r$residuals))
+
+#polls
+#mean(abs(pollsonly_d$residuals))
+#mean(abs(pollsonly_r$residuals))
+
+#fundamentals
+#mean(abs(fundamentals_d$residuals))
+#mean(abs(fundamentals_r$residuals))
+
+
+#midterm fundamentals
+#mean(abs(midtermfundamentals_d$residuals))
+#mean(abs(midtermfundamentals_r$residuals))
+
+
+```
+
+
+```{r}
+par(mfrow=c(3,2))
+{
+  
+    plot(rdi_d$fitted.values, alldata_dem$D_majorvote_pct,
+         main="RDI (Democrat)", xlab="predicted", ylab="true", 
+         cex.lab=2, cex.main=2, type='n',xlim=c(40,65),ylim=c(40,65))
+    text(rdi_d$fitted.values, alldata_dem$D_majorvote_pct, alldata_dem$Year)
+    abline(a=0, b=1, lty=2)
+    
+    plot(rdi_r$fitted.values, alldata_rep$R_majorvote_pct,
+         main="RDI (Republicans)", xlab="predicted", ylab="true", 
+         cex.lab=2, cex.main=2, type='n',xlim=c(40,55),ylim=c(40,55))
+    text(rdi_r$fitted.values, alldata_rep$R_majorvote_pct, alldata_rep$Year)
+    abline(a=0, b=1, lty=2)
+    
+    plot(pollsonly_d$fitted.values, alldata_dem$D_majorvote_pct,
+         main="Polls (Democrat)", xlab="predicted", ylab="true", 
+         cex.lab=2, cex.main=2, type='n',xlim=c(40,55),ylim=c(40,55))
+    text(pollsonly_d$fitted.values, alldata_dem$D_majorvote_pct, alldata_dem$Year)
+    abline(a=0, b=1, lty=2)
+    
+    plot(pollsonly_r$fitted.values, alldata_rep$R_majorvote_pct,
+         main="Polls (Republican)", xlab="predicted", ylab="true", 
+         cex.lab=2, cex.main=2, type='n',xlim=c(40,55),ylim=c(40,55))
+    text(pollsonly_r$fitted.values, alldata_rep$R_majorvote_pct, alldata_rep$Year)
+    abline(a=0, b=1, lty=2)
+    
+    plot(fundamentals_d$fitted.values, alldata_dem$D_majorvote_pct,
+         main="Polls and Fundamentals (Democrat)", xlab="predicted", ylab="true", 
+         cex.lab=2, cex.main=2, type='n',xlim=c(40,55),ylim=c(40,55))
+    text(fundamentals_d$fitted.values, alldata_dem$D_majorvote_pct, alldata_dem$Year)
+    abline(a=0, b=1, lty=2)
+    
+    plot(fundamentals_r$fitted.values, alldata_rep$R_majorvote_pct,
+         main="Polls and Fundamentals (Republican)", xlab="predicted", ylab="true", 
+         cex.lab=2, cex.main=2, type='n',xlim=c(40,55),ylim=c(40,55))
+    text(fundamentals_r$fitted.values, alldata_rep$R_majorvote_pct, alldata_rep$Year)
+    abline(a=0, b=1, lty=2)
+    
+}
+
+
+
+```
+```{r, outsample testing}
+#generic_averages2022
+
+generic_averages2022dem <- generic_averages_22 %>%
+  slice(851:n()) %>%
+  summarize(avg_supp_dem = mean(adjusted_dem))
+
+generic_averages2022rep <- generic_averages_22 %>%
+  slice(851:n()) %>%
+  summarize(avg_supp_rep = mean(adjusted_rep))
+
+```
+
+All in all, I selected the polls+fundamentals model as the overall best model due to it's lower average adjusted r^2 between the two models. Using this model, I aimed to yield an overall forecast of the 2022 election vote percentage for each of the two parties. Overall, my model predicted that the democrats would receive 51.62% of votes while Republicans would receive 48.342% of the votes. Overall, I think the key insight I will draw away from this week is the importance and predictive success of polls in forecasting party vote share. Meanwhile, I believe that I have sufficiently ruled out true economic conditions as a strong predictor once again. Yet, I'm curious if people's perceptions of the status of the economy are a more predictive measure than the true economic conditions themselves. I'm eager to improve this model next week and look at possibly the effects of President Biden's tenure in office and incumbency in the midterms. 
+
+
+```{r, predictions}
+
+dat_2022_dem <- data.frame(DSPIC_change_pct = -1.84, avgsupport = 44.76968)
+dat_2022_rep <- data.frame(DSPIC_change_pct = -1.84, avgsupport = 43.91133)
+
+#dat_2022_dem <- data.frame(DSPIC_change_pct = -1.84, avg_support = __)
+#dat_2022_rep <- data.frame(DSPIC_change_pct = -1.84, avg_support = __)
+
+## point predictions
+predict(fundamentals_d, newdata = dat_2022_dem)
+predict(fundamentals_r, newdata = dat_2022_rep)
+```
+
+CITATIONS:
+
