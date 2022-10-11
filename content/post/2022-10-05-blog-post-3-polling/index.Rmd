@@ -88,6 +88,7 @@ alldata_rep <- alldata %>%
   mutate(midterm = ifelse(Year %% 4, 1, 0))
 
 ```
+
 ```{r, dem models}
 rdi_d <- lm(D_majorvote_pct ~ DSPIC_change_pct , alldata_dem)
 
@@ -221,4 +222,8 @@ predict(fundamentals_r, newdata = dat_2022_rep)
 ```
 
 CITATIONS:
+
+Nate Silver. “How Fivethirtyeight's House, Senate and Governor Models Work.” FiveThirtyEight, FiveThirtyEight, 12 Sept. 2018, https://fivethirtyeight.com/methodology/how-fivethirtyeights-house-and-senate-models-work/. 
+
+G. Elliott Morris. “How the Economist Presidential Forecast Works.” The Economist, The Economist Newspaper, https://projects.economist.com/us-2020-forecast/president/how-this-works. 
 
