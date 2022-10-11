@@ -12,7 +12,7 @@ Hi everyone! Welcome back to this weeks election analytics blog post. While last
 
 Political campaigns are extraordinary operations with thousands of people working and volunteering each year. People dedicate their lives to running and studying these campaigns. With all this attention focused on persuading others and turning out support, the question becomes: How much does the adveretising element of campaigns matter? Perhaps one of the most prominent features of campaigns and political persuasion these days are advertisements. These aired ads use technology to motivate individuals to vote for a candidate on the ballot. Traditionally, on campaigns one would believe an increase in ads would increase support for a candidate. What I'm here to investigate today is if this line of thinking is really true. 
 
-```{r}
+```{r,echo = FALSE, message = FALSE, warning = FALSE, options(warn=1)}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, options(warn=1))
 # Loading in necessary libraries
 
