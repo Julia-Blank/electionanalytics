@@ -192,6 +192,8 @@ par(mfrow=c(3,2))
 
 
 ```
+
+
 ```{r, outsample testing}
 #generic_averages2022
 

@@ -1,0 +1,320 @@
+---
+title: 'Blogpost 5: Air Campaigns'
+author: ''
+date: '2022-10-07'
+slug: []
+categories: []
+tags: []
+---
+
+Hi everyone! Welcome back to this weeks election analytics blog post. While last week we were looking at the effect of expert prediction and polls, this week I am turning our attentions to the efficacy of air campaigns and it's role in predicting election outcomes. 
+
+Political campaigns are extraordinary operations with thousands of people working and volunteering each year. People dedicate their lives to running and studying these campaigns. With all this attention focused on persuading others and turning out support, the question becomes: How much does the adveretising element of campaigns matter? Perhaps one of the most prominent features of campaigns and political persuasion these days are advertisements. These aired ads use technology to motivate individuals to vote for a candidate on the ballot. Traditionally, on campaigns one would believe an increase in ads would increase support for a candidate. What I'm here to investigate today is if this line of thinking is really true. 
+
+```{r}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE) 
+# Loading in necessary libraries
+
+library(tidyverse)
+library(ggplot2)
+library(stargazer)
+library(janitor)
+library(readxl)
+
+library(tidyverse)
+library(ggplot2)
+library(blogdown)
+library(stargazer)
+library(readr)
+library(usmap)
+library(rmapshaper)
+library(sf)
+library(janitor)
+library(tigris)
+library(leaflet)
+
+```
+
+
+```{r}
+districtdata <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022-10-03-blog-post-4-expert-prediction-and-incumbency/04-Incumbency-9-29-/Section-data/District-level-forecast/house party vote share by district 1948-2020.csv")
+
+pollsdata <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS//electionanalytics/03-Polling (9-22)/section data/polls_df.csv")
+
+expert_ratings <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022-10-03-blog-post-4-expert-prediction-and-incumbency/04-Incumbency-9-29-/Section-data/District-level-forecast/expert_rating.csv")
+
+ads_2006_2018_1_ <- read_csv("Week5Aircampaigns/ads_2006_2018 (1).csv")
+
+ads_issuesdata <- read_csv("Week5Aircampaigns/ads_issues_2012-2018 (1).csv") 
+
+
+roper_cong_polls_1979_2022 <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022-10-03-blog-post-4-expert-prediction-and-incumbency/04-Incumbency-9-29-/roper_cong_polls_1979-2022.csv")
+
+historical_results <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022-10-07-blogpost-5-air-campaigns/incumb_dist_1948-2020 (3).csv")
+
+
+historical_results_old<- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022-10-03-blog-post-4-expert-prediction-and-incumbency/04-Incumbency-9-29-/Section-data/District-level-forecast/house party vote share by district 1948-2020.csv") %>%
+  clean_names()
+
+GenericPolls1942_2020 <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/03-Polling (9-22)/section data/GenericPolls1942_2020.csv")
+
+Generic_poll_2022 <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/03-Polling (9-22)/section data/538_generic_poll_2022.csv")
+```
+
+##BUILD DISTRICT LEVEL MODEL 
+
+```{r}
+
+  
+historical_results_clean <- historical_results %>%
+  mutate(dem_status = case_when(DemStatus == "Incumbent" ~ 1,
+                               TRUE ~ 0),
+         rep_status = case_when(RepStatus == "Incumbent" ~ 1,
+                               TRUE ~ 0))
+  #separate(area, into = c("area", "district"), sep = " ") %>%
+  #rename("year" = "race_year") %>%
+  #select(-area) %>%  
+  #mutate(district = case_when(
+    #district == "Large" ~ "AL",
+    #TRUE ~ district))
+
+avg_ratings <- expert_ratings %>% 
+  select(year, state, district, avg_rating) 
+
+historical_results_clean_dem <- historical_results_clean
+  #select(year, state, dem_votes_major_percent, DemStatus, district) 
+
+historical_results_clean_rep <- historical_results_clean
+
+  
+table(ads_issuesdata$cycle)
+
+ads_issuesdata$year <- format(as.Date(ads_issuesdata$airdate, format="%d/%m/%Y"),"%Y") 
+
+table(ads_issuesdata$year)
+
+ad_issues_rep <- ads_issuesdata %>%
+  filter(party == "Republican") %>%
+   mutate(year = as.double(year))
+
+ad_issues_dem <- ads_issuesdata %>%
+  filter(party == "Democrat") %>%
+  mutate(year = as.double(year)) %>%
+  group_by('state', 'race', 'district', 'party', 'cycle', 'year')
+  
+
+#historical_join <- historical_results_clean_dem %>%
+  #left_join(ad_issues_dem, by = c('year', 'st_cd_fips'))
+
+  
+historical_ad_merge_dem <- merge(historical_results_clean_dem, ad_issues_dem, by = c('year', 'st_cd_fips')) %>%
+  filter(party == "Democrat") %>%
+  group_by(cycle, st_cd_fips) %>%
+  mutate(avg_spend = sum(est_cost)) %>%
+  ungroup()
+
+historical_ad_merge_rep <- merge(historical_results_clean_rep, ad_issues_rep, by = c('year', 'st_cd_fips')) %>%
+  filter(party == "Republican") %>%
+  group_by(cycle, st_cd_fips, party ) %>%
+  mutate(avg_spend = sum(est_cost)) %>%
+  ungroup()
+```
+
+```{r}
+GenericPolls1942_2020_clean <- GenericPolls1942_2020 %>%
+  group_by(year) %>%
+  mutate(average_support_dem= mean(dem),
+         average_support_rep = mean(rep)) %>%
+  select(year, average_support_dem, average_support_rep) 
+
+historical_ad_merge_dem_memory <- historical_ad_merge_dem %>% 
+  select(year, st_cd_fips, office, state.x, winner_party, DemCandidate, DemStatus, DemVotesMajorPercent, winner_candidate, winner_candidate_inc, president_party, dem_status, creative, race, airtime, est_cost, ad_purpose, party, cycle, station, ad_tone, ad_purpose, avg_spend)
+
+historical_ad_merge_dem_memory %>%
+  left_join(GenericPolls1942_2020_clean, by = "year") 
+```
+To begin this analysis, I first wanted to descriptively look total ad spend by a party in a given election cycle. Looking at the data below, you can see that in recent years, democrats are spending more than republicans closer to an election cycle. Additionally, all campaigns are trying to spend more money on ads the closer it gets to election day. Interestingly, republican ad spend has decreased overtime since 2012 while Democrats ad spend certainly hasen't consistently. 
+
+```{r}
+library(scales)
+ads_issuesdata %>%
+  #mutate(year = as.numeric(substr(airdate, 1, 4))) %>%
+  mutate(month = as.numeric(substr(airdate, 6, 7))) %>%
+  #filter(cycle %in% c(2012, 2014, 2016, 2018), month > 7) %>%
+  group_by(cycle, airdate, party) %>%
+  summarise(total_cost = sum(est_cost)) %>%
+  ggplot(aes(x=airdate, y=total_cost, color=party)) +
+  # scale_x_date(date_labels = "%b, %Y") +
+  scale_y_continuous(labels = dollar_format()) +
+  scale_color_manual(values = c("blue","red"), name = "") +
+  geom_line() + geom_point(size=0.5) +
+  facet_wrap(cycle ~ ., scales="free") +
+  xlab("") + ylab("ad spend") +
+  theme_bw() +
+  theme(axis.title = element_text(size=15),
+        axis.text = element_text(size=11),
+        strip.text.x = element_text(size = 15))
+```
+
+After seeing some differential ad spend between the two parties in the most recent house elections, I wanted to see if there is a visual descriptive correlation between democrat vote share and democrat ad spend. The plot of the linear relationship between a party's total ad spend per a campaign and the party vote share is illustrated below. Looking at the plot for democrats, it appears that there is possibly a small positive correlation between ad spend and party vote share. However, this appears to be driven by an outlier point 12 million in ad spending. The relationship, if significant at all, seems very tiny especially since most of the points show little ad spend at all. This is likely due to the historical nature of the data and increasing but more recent prevalance of air campaigning. Looking at the graph of republican vote share versus total ad spend, there appears to be a negative correlation between total ad spend and party vote share. However, this seems to be driven by a few outlier points of higher spend and lower vote share. From looking at these two graphs, total ad spend by a party does not seem to clearly drive party vote share in any consistent way. This makes me think perhaps total ad spend will be a weaker covariate than I'd hoped. 
+
+
+```{r}
+dem_reg_plot <- historical_ad_merge_dem_memory %>%
+  ggplot(aes(x  = avg_spend, y = DemVotesMajorPercent)) +
+  geom_point() +
+  geom_smooth(method = lm, formula = y ~ x) +
+  xlab("Democrat Ad Spend Per Campaign") +
+  scale_x_continuous(labels = dollar_format()) +
+  ylab("Democrat Vote Share") + 
+  labs(title = "Democrat Vote Share vs Ad Spend") #subtitle = "Congressional districts where both parties bought ads, midterm elections 2006-2018")
+
+rep_reg_plot <- historical_ad_merge_rep%>%
+  ggplot(aes(x  = avg_spend, y = RepVotesMajorPercent)) +
+  geom_point() +
+  geom_smooth(method = lm, formula = y ~ x) +
+  xlab("Republican Ad Spend Per Campaign") +
+  scale_x_continuous(labels = dollar_format()) +
+  ylab("Republican Vote Share") + 
+  labs(title = "Republican Vote Share vs Ad Spend") #subtitle = "Congressional districts where both parties bought ads, midterm elections 2006-2018")
+
+dem_reg_plot
+rep_reg_plot
+  
+```
+
+
+
+```{r}
+# Joining the data and nesting by state and district
+train_data_dem <- historical_ad_merge_dem_memory %>% 
+  filter(year != 2018) %>% 
+  # left join as there aren't ratings for every district
+  #left_join(dem_results, by = c("year", "state", "district")) %>% 
+  group_by(st_cd_fips) %>% 
+  filter(n() > 1) %>% # Filtering out single data rows
+  group_nest() %>% 
+  mutate(data = map(data, ~unnest(., cols = c())))
+
+train_data_rep <- historical_ad_merge_rep %>% 
+  filter(year != 2018) %>% 
+  # left join as there aren't ratings for every district
+  #left_join(dem_results, by = c("year", "state", "district")) %>% 
+  group_by(st_cd_fips) %>% 
+  filter(n() > 1) %>% # Filtering out single data rows
+  group_nest() %>% 
+  mutate(data = map(data, ~unnest(., cols = c())))
+
+
+
+```
+
+To test this out in a district level model, I aimed to predict party vote share using a combination of candidate incumbency status and ad spend. The equations for the two models are below. 
+
+$$ DemVotesMajorPercent = Avgerag Ad Spend + DemStatus$$
+$$ RepVotesMajorPercent = Avgerag Ad Spend + RepStatus$$
+
+```{r, models}
+modelsdem <- train_data_dem %>% 
+  mutate(modeldem = map(data, ~lm(DemVotesMajorPercent ~ avg_spend + dem_status, 
+                                  data = .x))) %>%
+  select(-data)
+
+modelsrep <- train_data_rep %>% 
+  mutate(modelrep = map(data, ~lm(RepVotesMajorPercent ~ avg_spend + rep_status, 
+                                  data = .x))) %>%
+  select(-data)
+
+
+model_dem_results <- modelsdem %>% 
+  mutate(r_squared = map_dbl(modeldem, ~summary(.x)$r.squared)) 
+
+
+model_rep_results <- modelsrep %>% 
+  mutate(r_squared = map_dbl(modelrep, ~summary(.x)$r.squared))
+
+
+```
+
+
+
+```{r}
+
+new_test_dem <- historical_ad_merge_dem_memory %>% 
+  filter(year == 2018) %>% 
+  filter(n() > 1) %>%
+  group_by(st_cd_fips) %>%
+  filter( row_number()==1) %>%
+  group_nest() %>%
+  mutate(data = map(data, ~unnest(., cols = c())))
+
+
+pred_2018_d <- new_test_dem %>%
+  # inner join as there may not be historical models for some districts
+  inner_join(modelsdem, by = "st_cd_fips") %>%
+  mutate(pred = map(.x = modeldem, .y = data, ~predict(object = .x, newdata = as.data.frame(.y)))) %>%
+  unnest(pred) %>%
+  select(st_cd_fips, pred)
+  
+test_data_rep <- historical_ad_merge_rep %>% 
+  filter(year == 2018) %>% 
+  group_by(st_cd_fips) %>% 
+  filter(row_number()==1) %>%
+  group_nest() %>% 
+  mutate(data = map(data, ~unnest(., cols = c())))
+
+
+#predictions 2022 of demvotes with all dem_status = 1 for incumbent
+pred_2018_r <- test_data_rep %>%
+  # inner join as there may not be historical models for some districts
+  inner_join(modelsrep, by = "st_cd_fips") %>% 
+  mutate(pred = map(.x = modelrep, .y = data, ~predict(object = .x, newdata = as.data.frame(.y)))) %>%
+  unnest(pred)%>%
+  select(st_cd_fips, pred)
+
+
+
+```
+
+
+Looking at the model, the average r_squared value is 0.5047 which is much less than last weeks. This means that this models predictive power is much weaker than the week before that was predicting off of president incumbency and polls. Assuming that each district has similarly amounts of data points to last week (which I verified is true), then this model is performing weaker than last weeks. 
+
+Overall, my model is predicting that Democrats will win on average 54.0088 percent of two party vote share in the election. This seems like quite a high estimate and is perhaps driven by the small positive relationship  between ad spend and democrat party vote share that we witnessed in our regression visualization above. 
+
+```{r}
+#new_test_dem$datad
+#modelsdem$modeldem #214
+
+## NUMBER OF DISTRICTS DEMS PREDICTED TO WIN VOTE SHARE
+numofdistricts <- pred_2018_d %>%
+  mutate(demwin = case_when(pred>=50 ~ 1,
+                            TRUE ~0
+  )) %>%
+  summarise(sum(demwin)/130)
+
+
+##AVERAGE prediction for dem vote share
+averagepred <- pred_2018_d %>%
+  summarize(mean(pred)) %>% pull
+
+
+##AVERAGE R2 for w/ incumbency
+
+r2average <- model_dem_results %>%
+  summarize(average_rsquared = mean(r_squared))
+  
+r2average
+
+```
+
+
+CONCLUSION
+
+In the words of Professor Ryan Enos, "Sometimes finding nothing is actually finding something." This week my model yielded quite dismal results and it can be seen that total ad spend is not a strong predictor of party vote share in a house election. This finding is fascinating because so much of political campaigns revolve around raising money to then spend on ads. I have a few theories for why these results may have been seen in my regression. First off, total ad spend is not a relative metric but an intrinsic one, meaning that total ad spend is just a magnitude but without accounting for what the other party is spending, the value may not mean that much. Beyond this, it doesn't appear that increasing spending alone increase party vote share for either the democrats or republicans. I believe a few factors play into this. First off, democrats in recent years where the data is present more on ads in the house than republicans did, especially closer to election days. Second off, I'm curious as to whether republicans are buying just as many ads but in cheaper districts like rural areas. Since rural areas often sell ads for cheaper, it could be possible that ads are cheaper in these districts so republicans are spending less but running just as many ads. This leads me to believe that ad spend is less important than actual proportion of ads bought. Proportion of ads bought would be a more relative measure and account for differences in pricing in various regions. For my next model, I may include these findings instea dof ad spend. All in all, I believe I will be returning to last weeks model for a better picture of the midterm election than this one.  
+
+##CITATIONS
+
+Schuster, Steven Sprick, and Middle Tennessee State University “Does Campaign Spending Affect Election Outcomes? New Evidence from Transaction-Level Disbursement Data: The Journal of Politics: Vol 82, No 4.” The Journal of Politics, 1 Oct. 2020, https://www.journals.uchicago.edu/doi/10.1086/708646. 
+
+
+

@@ -20,6 +20,11 @@ historical_results <- read_csv("04-Incumbency-9-29-/Section-data/District-level-
   clean_names()
 incumb_dist_1948_2022_2_ <- read_csv("04-Incumbency-9-29-/Section-data/incumb_dist_1948-2022 (2).csv")
 roper_cong_polls_1979_2022 <- read_csv("04-Incumbency-9-29-/roper_cong_polls_1979-2022.csv")
+
+incmbency <- read_csv("content/post/2022-10-07-blogpost-5-air-campaigns/incumb_dist_1948-2020 (3).csv")
+```
+```{r}
+
 ```
 
 ## Including Plots
