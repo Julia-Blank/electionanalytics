@@ -6,14 +6,43 @@
     <description>Recent content on My New Hugo Site</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 03 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 07 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Blogpost 5: Air Campaigns</title>
+      <link>http://example.org/post/2022-10-07-blogpost-5-air-campaigns/</link>
+      <pubDate>Fri, 07 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://example.org/post/2022-10-07-blogpost-5-air-campaigns/</guid>
+      <description>Hi everyone! Welcome back to this weeks election analytics blog post. While last week we were looking at the effect of expert prediction and polls, this week I am turning our attentions to the efficacy of air campaigns and it’s role in predicting election outcomes.
+Political campaigns are extraordinary operations with thousands of people working and volunteering each year. People dedicate their lives to running and studying these campaigns. With all this attention focused on persuading others and turning out support, the question becomes: How much does the adveretising element of campaigns matter?</description>
+    </item>
+    
     <item>
       <title>Blog Post 4: Expert Prediction and Incumbency</title>
       <link>http://example.org/post/2022-10-03-blog-post-4-expert-prediction-and-incumbency/</link>
       <pubDate>Mon, 03 Oct 2022 00:00:00 +0000</pubDate>
       
       <guid>http://example.org/post/2022-10-03-blog-post-4-expert-prediction-and-incumbency/</guid>
-      <description>knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE) # Loading in necessary libraries library(tidyverse) ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ── ## ✔ ggplot2 3.3.5 ✔ purrr 0.3.4 ## ✔ tibble 3.1.6 ✔ dplyr 1.0.7 ## ✔ tidyr 1.2.0 ✔ stringr 1.4.0 ## ✔ readr 2.1.2 ✔ forcats 0.5.1 ## Warning: package &amp;#39;tidyr&amp;#39; was built under R version 4.0.5 ## Warning: package &amp;#39;readr&amp;#39; was built under R version 4.</description>
+      <description>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ── ## ✔ ggplot2 3.3.5 ✔ purrr 0.3.4 ## ✔ tibble 3.1.6 ✔ dplyr 1.0.7 ## ✔ tidyr 1.2.0 ✔ stringr 1.4.0 ## ✔ readr 2.1.2 ✔ forcats 0.5.1 ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ── ## ✖ dplyr::filter() masks stats::filter() ## ✖ dplyr::lag() masks stats::lag() ## ## Please cite as: ## Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables. ## R package version 5.</description>
+    </item>
+    
+    <item>
+      <title>Blog post 3: Polling</title>
+      <link>http://example.org/post/2022-09-26-blog-post-3-polling/</link>
+      <pubDate>Mon, 26 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://example.org/post/2022-09-26-blog-post-3-polling/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Blog Post 3: Polling</title>
+      <link>http://example.org/post/2022-10-05-blog-post-3-polling/</link>
+      <pubDate>Sun, 25 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://example.org/post/2022-10-05-blog-post-3-polling/</guid>
+      <description>Hi everyone! Welcome back to my election analytics blog. While last week we were looking at purely economic factors, this week I am turning our attentions to the power of the poll and it’s role in predicting election outcomes.
+Nate Silver crafts Fivethirtyeight’s election prediction in 2022 by creating 3 versions of one model: the lite, classic, and deluxe models. Each version of the model builds upon each other iterratively in complexity.</description>
     </item>
     
     <item>
