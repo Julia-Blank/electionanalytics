@@ -7,7 +7,7 @@ categories: []
 tags: []
 ---
 
-```{r}
+```{r,echo = FALSE, warning = FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE) 
 # Loading in necessary libraries
 
@@ -130,7 +130,7 @@ ggplot() +
 ```
 
 
-In order to compare efficacy of expert predictions, I then created a map of how likely experts predicted each district was to go to each party.  To do so, I combined numerical ratings that expert predictors gave each district based on how likely they were to lean towards a certain partisanship. The scaled range from 1 which mean safely leaning democrat to 7 which meant it was safely lean republican. In the map below, blue is associated with lower numbers and democrats, white(4.0) with the most uncertain swing districts, and red with the highest numbers and republican victories. The image can be seen below. 
+In order to compare efficacy of expert predictions, I then created a map of how likely experts predicted each district was to go to each party.  To do so, I combined numerical ratings that expert predictors gave each district based on how likely they were to lean towards a certain partisanship. The scaled range from 1 which mean safely leaning democrat to 7 which meant it was safely lean republican.In the map below, blue is associated with lower numbers and democrats, white(4.0) with the most uncertain swing districts, and red with the highest numbers and republican victories. The image can be seen below. 
 
 ```{r, expert prediction maps}
 #load in 2018 ratings data
@@ -259,7 +259,7 @@ modelsnoincumbent_results <- modelsnoincumbent %>%
 
 ```
 
-The first model predicts democratic vote share based upon average expert ratings and incumbency. After training it on historical data for each district, the model predicted that among all districts nationally that democrats in 2022 would win yielded on average for all districts an r^2 value of  0.7814, which is the highest of all my models thus far. This says that combining expert predictions and incumbency is a promising way of explaining variation in democratic vote share percentage in an election. 
+The first model predicts democratic vote share based upon average expert ratings and incumbency. After training it on historical data for each district, the model predicted that among all districts nationally that democrats in 2022 would win yielded on average for all districts an r^2 value of  0.7814, which is the highest of all my models thus far. This says that combining expert predictions and incumbency is a promising way of explaining variation in democratic vote share percentage in an election. I believe this is likely because expert prediction is incorporating all variables that pundits have viewed to be effective in the past. Additionally, 
 
 ```{r}
 #creating testdata
@@ -273,12 +273,13 @@ test_data <- test2022attempt %>%
   group_nest() %>% 
   mutate(datad = map(data, ~unnest(., cols = c())))
 
-#predictions 2022 for models dem with incumbent
+#predictions 2022 of demvotes with all dem_status = 1 for incumbent
 pred_2022 <- test_data %>%
   # inner join as there may not be historical models for some districts
   inner_join(modelsdem, by = c("state", "district")) %>% 
   mutate(pred = map_dbl(.x = modeldem, .y = datad, ~predict(object = .x, newdata = as.data.frame(.y)))) %>%
   select(state, district, pred)
+
 
 #print(pred_2022)
 
@@ -315,7 +316,7 @@ pred_2022_noincumb <- test_data %>%
 #print(pred_2022_noincumb)
 
 ## NUMBER OF DISTRICTS DEMS PREDICTED TO WIN VOTE SHARE
-numofdistricts <- pred_2022 %>%
+numofdistricts <- pred_2022_noincumb %>%
   mutate(demwin = case_when(pred>=50 ~ 1,
                             TRUE ~0
   )) %>%
@@ -323,15 +324,23 @@ numofdistricts <- pred_2022 %>%
 
 
 ##AVERAGE prediction for dem vote share
-averagepred <- pred_2022 %>%
+averageprednoincumb <- pred_2022_noincumb %>%
   summarize(mean(pred)) %>% pull
 
 ##AVERAGE R2 for w/ incumbency
 
-r2average <- modelsnoincumbent_results %>%
+r2averagenoincumb <- modelsnoincumbent_results %>%
   summarize(mean(r_squared))
 ```
 
+$$
+Democratic Vote Share = Average Expert Prediction
+$$
+
+$$
+Democratic Vote Share = Average Expert Prediction + IncumbentPresident
+
+$$
 
 ```{r}
 #looking at my district specifically in both models

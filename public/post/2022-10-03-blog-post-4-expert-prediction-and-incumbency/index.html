@@ -64,56 +64,29 @@
 		
 
 
-<pre class="r"><code>knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE) 
-# Loading in necessary libraries
-
-library(tidyverse)</code></pre>
 <pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
 <pre><code>## ✔ ggplot2 3.3.5     ✔ purrr   0.3.4
 ## ✔ tibble  3.1.6     ✔ dplyr   1.0.7
 ## ✔ tidyr   1.2.0     ✔ stringr 1.4.0
 ## ✔ readr   2.1.2     ✔ forcats 0.5.1</code></pre>
-<pre><code>## Warning: package &#39;tidyr&#39; was built under R version 4.0.5</code></pre>
-<pre><code>## Warning: package &#39;readr&#39; was built under R version 4.0.5</code></pre>
 <pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>library(ggplot2)
-library(stargazer)</code></pre>
-<pre><code>## Warning: package &#39;stargazer&#39; was built under R version 4.0.5</code></pre>
 <pre><code>## 
 ## Please cite as:</code></pre>
 <pre><code>##  Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.</code></pre>
 <pre><code>##  R package version 5.2.3. https://CRAN.R-project.org/package=stargazer</code></pre>
-<pre class="r"><code>library(janitor)</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;janitor&#39;</code></pre>
 <pre><code>## The following objects are masked from &#39;package:stats&#39;:
 ## 
 ##     chisq.test, fisher.test</code></pre>
-<pre class="r"><code>library(readxl)</code></pre>
-<pre><code>## Warning: package &#39;readxl&#39; was built under R version 4.0.5</code></pre>
-<pre class="r"><code>library(tidyverse)
-library(ggplot2)
-library(blogdown)
-library(stargazer)
-library(readr)
-library(usmap)</code></pre>
-<pre><code>## Warning: package &#39;usmap&#39; was built under R version 4.0.5</code></pre>
-<pre class="r"><code>library(rmapshaper)</code></pre>
 <pre><code>## Registered S3 method overwritten by &#39;geojsonlint&#39;:
 ##   method         from 
 ##   print.location dplyr</code></pre>
-<pre class="r"><code>library(sf)</code></pre>
-<pre><code>## Warning: package &#39;sf&#39; was built under R version 4.0.5</code></pre>
 <pre><code>## Linking to GEOS 3.9.1, GDAL 3.4.0, PROJ 8.1.1; sf_use_s2() is TRUE</code></pre>
-<pre class="r"><code>library(janitor)
-library(tigris)</code></pre>
-<pre><code>## Warning: package &#39;tigris&#39; was built under R version 4.0.5</code></pre>
 <pre><code>## To enable caching of data, set `options(tigris_use_cache = TRUE)`
 ## in your R script or .Rprofile.</code></pre>
-<pre class="r"><code>library(leaflet)</code></pre>
-<pre><code>## Warning: package &#39;leaflet&#39; was built under R version 4.0.5</code></pre>
 <p>Hi everyone! We’re back this week with another set of models this time exploring the important concepts of expert prediction and incumbency. This week through building models with expert predictions and incumbency, I’ve set out to investigate: How well do experts do at explaining election outcomes on average and does incumbency have a redundant effect or add something profound to our own predictions?</p>
 <p>To first begin investigating this question, I explored how well expert predictions have historically predicted elections in the past. I did this by comparing the true Democratic vote Share in the 2018 midterms to the expert predictions of party victory in each district. To do this, I first started by aggregating the true democratic vote share for each district and mapping them. The states with the most vote share (above 50%) are the bluest and the states with the least democratic vote share (under 50%) are the reddest, while the tossup states are the whitest. The map can be viewed below.</p>
 <pre><code>## 
@@ -198,6 +171,8 @@ library(tigris)</code></pre>
   |                                                                            
   |================                                                      |  23%
   |                                                                            
+  |================                                                      |  24%
+  |                                                                            
   |=================                                                     |  24%
   |                                                                            
   |=================                                                     |  25%
@@ -236,10 +211,6 @@ library(tigris)</code></pre>
   |                                                                            
   |========================                                              |  35%
   |                                                                            
-  |=========================                                             |  35%
-  |                                                                            
-  |=========================                                             |  36%
-  |                                                                            
   |==========================                                            |  37%
   |                                                                            
   |==========================                                            |  38%
@@ -257,6 +228,8 @@ library(tigris)</code></pre>
   |=============================                                         |  41%
   |                                                                            
   |=============================                                         |  42%
+  |                                                                            
+  |==============================                                        |  42%
   |                                                                            
   |==============================                                        |  43%
   |                                                                            
@@ -294,6 +267,10 @@ library(tigris)</code></pre>
   |                                                                            
   |=====================================                                 |  53%
   |                                                                            
+  |=====================================                                 |  54%
+  |                                                                            
+  |======================================                                |  54%
+  |                                                                            
   |======================================                                |  55%
   |                                                                            
   |=======================================                               |  55%
@@ -323,6 +300,8 @@ library(tigris)</code></pre>
   |============================================                          |  62%
   |                                                                            
   |============================================                          |  63%
+  |                                                                            
+  |============================================                          |  64%
   |                                                                            
   |=============================================                         |  64%
   |                                                                            
@@ -392,6 +371,8 @@ library(tigris)</code></pre>
   |                                                                            
   |==========================================================            |  84%
   |                                                                            
+  |===========================================================           |  84%
+  |                                                                            
   |===========================================================           |  85%
   |                                                                            
   |============================================================          |  85%
@@ -446,14 +427,20 @@ library(tigris)</code></pre>
   |                                                                            
   |======================================================================| 100%</code></pre>
 <p><img src="http://example.org/post/2022-10-03-blog-post-4-expert-prediction-and-incumbency/index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
-<p>In order to compare efficacy of expert predictions, I then created a map of how likely experts predicted each district was to go to each party. To do so, I combined numerical ratings that expert predictors gave each district based on how likely they were to lean towards a certain partisanship. The scaled range from 1 which mean safely leaning democrat to 7 which meant it was safely lean republican. In the map below, blue is associated with lower numbers and democrats, white(4.0) with the most uncertain swing districts, and red with the highest numbers and republican victories. The image can be seen below.</p>
+<p>In order to compare efficacy of expert predictions, I then created a map of how likely experts predicted each district was to go to each party. To do so, I combined numerical ratings that expert predictors gave each district based on how likely they were to lean towards a certain partisanship. The scaled range from 1 which mean safely leaning democrat to 7 which meant it was safely lean republican.In the map below, blue is associated with lower numbers and democrats, white(4.0) with the most uncertain swing districts, and red with the highest numbers and republican victories. The image can be seen below.</p>
 <p><img src="http://example.org/post/2022-10-03-blog-post-4-expert-prediction-and-incumbency/index_files/figure-html/expert%20prediction%20maps-1.png" width="672" />
 Comparing the two images, it appears that experts were incredibly accurate at predicting which way districts were going to swing and event the degree to which how large the voting share would be. From the images, the degree of certainty to which experts predicted a state would lean one way or another directly correlated to how far the democratic vote share percentage veered from 50%. The only routine differences I see between the expert predictions and vote share percentage in actuality is that it appears in districts that vote share was more favorable to democrats in regions that experts thought would lean slightly more republican.</p>
 <p>Now that we’ve established that expert predictions in aggregate are quite close to the actual vote share percentage exhibited in historical elections, it is time to see how strong of a predictor they really are. As well as, how might incumbency play a role in our predictions as well.</p>
 <p>Before we get into the nitty gritty of the models, let’s recap that incumbency is one of the most fundamental and talked about variables that go into election predictions. But for those who don’t avidly read Nate Silver’s every tweet, you may be wondering why? So let’s first break this down.</p>
 <p>Incumbency is typically seen as an advantage but the label of being an incumbent itself isn’t necessarily the key determinant of winning on its own, rather it is the meaning behind what having held office before. Being an incumbent can lead to an advantage due to name recognition alone, but also if a candidate is viewed to have done a good job whether it be ensuring economic success or passing favorable legislation for their district. However, poor performance or coincidental measures of performance like the economy may have profoundly negative effects. As such, incumbency itself may not represent the whole picture of an electoral outcome.</p>
 <p>Building off of last week’s models, I recognized that the economic variables of performance used were not good at explaining the variation in two party vote share in an election. As such, I decided to drop this variable from my model altogether. In addition, since I knew I was bringing in expert predictions, and understood that these predictions incorporate polling heavily, I decided to throw out the general poll variable as well. As such, this week I decided to test two models: one with just average expert ratings and another with average expert ratings and incumbency. To start, (due to technical difficulties) I created one model that looks only at democrats. I’m trying to look at how democratic vote share is impacted by whether a democrat is an incumbent or not. For democrats only, the relationship between incumbency and vote shore</p>
-<p>The first model predicts democratic vote share based upon average expert ratings and incumbency. After training it on historical data for each district, the model predicted that among all districts nationally that democrats in 2022 would win yielded on average for all districts an r^2 value of 0.7814, which is the highest of all my models thus far. This says that combining expert predictions and incumbency is a promising way of explaining variation in democratic vote share percentage in an election.</p>
+<p>The first model predicts democratic vote share based upon average expert ratings and incumbency. After training it on historical data for each district, the model predicted that among all districts nationally that democrats in 2022 would win yielded on average for all districts an r^2 value of 0.7814, which is the highest of all my models thus far. This says that combining expert predictions and incumbency is a promising way of explaining variation in democratic vote share percentage in an election. I believe this is likely because expert prediction is incorporating all variables that pundits have viewed to be effective in the past. Additionally,</p>
+<p><span class="math display">\[
+Democratic Vote Share = Average Expert Prediction
+\]</span></p>
+<p>$$
+Democratic Vote Share = Average Expert Prediction + IncumbentPresident</p>
+<p>$$</p>
 <pre><code>## 
 ## ==============================================================
 ##                                Dependent variable:            
@@ -486,7 +473,8 @@ Campbell, J. E., &amp; Mann, T. E. (2016, July 28). Forecasting the presidential
 	</div>
 
 	<div class="pagination">
-		<a href="/post/2022-09-14-test-post-1/" class="left arrow">&#8592;</a>
+		<a href="/post/2022-09-26-blog-post-3-polling/" class="left arrow">&#8592;</a>
+		<a href="/post/2022-10-07-blogpost-5-air-campaigns/" class="right arrow">&#8594;</a>
 
 		<a href="#" class="top">Top</a>
 	</div>
@@ -496,7 +484,7 @@ Campbell, J. E., &amp; Mann, T. E. (2016, July 28). Forecasting the presidential
         		<footer>
 			
 			<span>
-			&copy; <time datetime="2022-10-03 16:04:11.024387 -0400 EDT m=&#43;0.177688856">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2022-10-11 17:32:44.371302 -0400 EDT m=&#43;0.122070636">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
