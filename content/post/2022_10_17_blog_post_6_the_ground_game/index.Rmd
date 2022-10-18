@@ -8,7 +8,7 @@ tags: []
 ---
 
 
-```{r,echo = FALSE, warning = FALSE}
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE) 
 # Loading in necessary libraries
 
@@ -106,7 +106,7 @@ train_data_rep <- final_data %>%
 
 ```
 
-```{r}
+```{r, message = FALSE}
 #run democrat and republican model on respective training dataset
 modelsdem <- train_data_dem %>% 
   mutate(modeldem = map(data, ~lm(DemVotesMajorPct ~ turnout + avg_rating + dem_status, 
@@ -122,16 +122,5 @@ modelsdemglm <- train_data_dem %>%
   select(-data)
 
 
-#summary(modelsdemglm)$deviance
-modelsdemglm_results <-  modelsdemglm %>% 
-  mutate(rsquared = map_dbl(modeldem, with(summary(modeldem), 1 - deviance/null.deviance))) %>%
-  select(-data)
-
-  mutate(r_squared = map_dbl(modeldem, with(summary(.x), 1 - deviance/null.deviance)))
-
 
 ```
-
-
-
-
