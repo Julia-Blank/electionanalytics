@@ -12,8 +12,8 @@ Hi everyone! Welcome back to this weeks election analytics blog post. While last
 
 Political campaigns are extraordinary operations with thousands of people working and volunteering each year. People dedicate their lives to running and studying these campaigns. With all this attention focused on persuading others and turning out support, the question becomes: How much does the adveretising element of campaigns matter? Perhaps one of the most prominent features of campaigns and political persuasion these days are advertisements. These aired ads use technology to motivate individuals to vote for a candidate on the ballot. Traditionally, on campaigns one would believe an increase in ads would increase support for a candidate. What I'm here to investigate today is if this line of thinking is really true. 
 
-```{r}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, options(warn=1))
+```{r,echo = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, options(warn=-1))
 # Loading in necessary libraries
 
 library(tidyverse)
@@ -30,7 +30,7 @@ library(stargazer)
 ```
 
 
-```{r}
+```{r , warning = FALSE, message = FALSE}
 districtdata <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022-10-03-blog-post-4-expert-prediction-and-incumbency/04-Incumbency-9-29-/Section-data/District-level-forecast/house party vote share by district 1948-2020.csv")
 
 pollsdata <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS//electionanalytics/03-Polling (9-22)/section data/polls_df.csv")
@@ -121,8 +121,8 @@ GenericPolls1942_2020_clean <- GenericPolls1942_2020 %>%
 historical_ad_merge_dem_memory <- historical_ad_merge_dem %>% 
   select(year, st_cd_fips, office, state.x, winner_party, DemCandidate, DemStatus, DemVotesMajorPercent, winner_candidate, winner_candidate_inc, president_party, dem_status, creative, race, airtime, est_cost, ad_purpose, party, cycle, station, ad_tone, ad_purpose, avg_spend)
 
-historical_ad_merge_dem_memory %>%
-  left_join(GenericPolls1942_2020_clean, by = "year") 
+#historical_ad_merge_dem_memory %>%
+  #left_join(GenericPolls1942_2020_clean, by = "year") 
 ```
 To begin this analysis, I first wanted to descriptively look total ad spend by a party in a given election cycle. Looking at the data below, you can see that in recent years, democrats are spending more than republicans closer to an election cycle. Additionally, all campaigns are trying to spend more money on ads the closer it gets to election day. Interestingly, republican ad spend has decreased overtime since 2012 while Democrats ad spend certainly hasen't consistently. 
 
@@ -202,8 +202,9 @@ train_data_rep <- historical_ad_merge_rep %>%
 
 To test this out in a district level model, I aimed to predict party vote share using a combination of candidate incumbency status and ad spend. The equations for the two models are below. 
 
-$$ DemVotesMajorPercent = Avgerag Ad Spend*b_1 + DemStatus*b_2$$
-$$ RepVotesMajorPercent = Avgerag Ad Spend*b_1 + RepStatus*b_2$$
+Democratic Vote Share = Average_Ad_Spend*x_1 + Incumbency_of_Dem_candidate*x_2
+
+Democratic Vote Share = Average_Ad_Spend*x_1 + Incumbency_of_Rem_candidate*x_2
 
 ```{r, models}
 modelsdem <- train_data_dem %>% 
