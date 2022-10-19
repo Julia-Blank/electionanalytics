@@ -1,0 +1,126 @@
+---
+title: 'Blog Post 6: The Ground Game'
+author: ''
+date: '2022-10-17'
+slug: []
+categories: []
+tags: []
+---
+
+
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE) 
+# Loading in necessary libraries
+
+library(tidyverse)
+library(ggplot2)
+library(stargazer)
+library(janitor)
+library(readxl)
+
+library(tidyverse)
+library(ggplot2)
+library(blogdown)
+library(stargazer)
+library(readr)
+library(usmap)
+library(rmapshaper)
+library(sf)
+library(janitor)
+library(tigris)
+library(leaflet)
+```
+
+```{r}
+expert_ratings <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022-10-03-blog-post-4-expert-prediction-and-incumbency/04-Incumbency-9-29-/Section-data/District-level-forecast/expert_rating.csv")
+
+historical_results <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022-10-03-blog-post-4-expert-prediction-and-incumbency/04-Incumbency-9-29-/Section-data/District-level-forecast/house party vote share by district 1948-2020.csv") %>%
+  clean_names()
+
+incumb_dist_1948_2020_3_ <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022_10_17_blog_post_6_the_ground_game/06_Ground-Game_10-13/Section data/incumb_dist_1948-2020 (3).csv")
+
+roper_cong_polls_1979_2022 <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022-10-03-blog-post-4-expert-prediction-and-incumbency/04-Incumbency-9-29-/roper_cong_polls_1979-2022.csv")
+
+cvap_district<- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022_10_17_blog_post_6_the_ground_game/06_Ground-Game_10-13/Section data/cvap_district_2012-2020_clean.csv")
+
+polls_df <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022_10_17_blog_post_6_the_ground_game/06_Ground-Game_10-13/Section data/house_polls_long.csv")
+
+```
+
+```{r}
+avg_ratings <- expert_ratings %>% 
+  select(year, state, district, avg_rating)
+  
+
+
+dem_results_new <- incumb_dist_1948_2020_3_ %>%
+    mutate(dem_status = case_when(DemStatus == "Incumbent" ~ 1,
+                               TRUE ~ 0),
+         rep_status = case_when(RepStatus == "Incumbent" ~ 1,
+                               TRUE ~ 0))
+
+# rename geoid
+cvap_district <- cvap_district %>%
+  rename(st_cd_fips = geoid) 
+
+
+polls_cvap_df <- merge(polls_df, cvap_district, by = c('st_cd_fips', 'year'))
+
+polls_cvap_vp_df <- merge(polls_cvap_df, dem_results_new, by = c('st_cd_fips', 'year')) %>%
+    rename(state_name = state.x) %>%
+    mutate(totalvotes = RepVotes + DemVotes,
+         turnout = totalvotes/cvap) %>%
+    mutate(DemVotesMajorPct = DemVotesMajorPercent/100,
+         RepVotesMajorPct = RepVotesMajorPercent/100) %>%
+  #FILTER OUT UNCONTESTED SEATS
+  filter(!is.na(DemCandidate), !is.na(RepCandidate)) %>%
+  mutate(DemVotesMajorPct = DemVotesMajorPercent/100,
+         RepVotesMajorPct = RepVotesMajorPercent/100)
+
+s <- which(avg_ratings$district < 10)
+
+avg_ratings_clean <- avg_ratings %>%
+  mutate(cd_fips = case_when(as.numeric(district) < 10 ~ paste0("0", district),
+                                TRUE ~ district)) %>%
+  rename(state_name = state) %>%
+  drop_na()
+  
+final_data <- polls_cvap_vp_df %>%
+  left_join(avg_ratings_clean, by = c("state_name", "cd_fips", "year"))
+
+train_data_dem <- final_data %>%
+  filter(year != 2022) %>% 
+  group_by(st_cd_fips) %>%
+  filter(n() > 1) %>% # Filtering out single data rows
+  drop_na() %>%
+  group_nest() %>% 
+  mutate(data = map(data, ~unnest(., cols = c())))
+  
+train_data_rep <- final_data %>%
+  filter(year != 2022) %>% 
+  group_by(st_cd_fips) %>%
+  filter(n() > 1) %>% # Filtering out single data rows
+  group_nest() %>% 
+  mutate(data = map(data, ~unnest(., cols = c()))) 
+
+
+```
+
+```{r, message = FALSE}
+#run democrat and republican model on respective training dataset
+modelsdem <- train_data_dem %>% 
+  mutate(modeldem = map(data, ~lm(DemVotesMajorPct ~ turnout + avg_rating + dem_status, 
+                                  data = .x))) %>%
+  select(-data)
+
+model_results_dem <- modelsdem %>% 
+  mutate(r_squared = map_dbl(modeldem, ~summary(.x)$r.squared))
+
+modelsdemglm <- train_data_dem %>% 
+  mutate(modeldem = map(data, ~glm(DemVotesMajorPct ~ turnout + avg_rating + dem_status, 
+                                  data = .x, family = binomial(link="logit")))) %>%
+  select(-data)
+
+
+
+```
