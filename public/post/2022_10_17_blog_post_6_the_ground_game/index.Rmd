@@ -7,6 +7,7 @@ categories: []
 tags: []
 ---
 
+Hi everyone! We’re back this week with another set of models this time exploring the important concept of turnout. This week through building models using a measure of turnout, I’ve set out to investigate: How much does voter turnout actually explain election outcomes on average and does turnout benefit one party over another?
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE) 
@@ -31,7 +32,7 @@ library(tigris)
 library(leaflet)
 ```
 
-```{r}
+```{r, warning = FALSE, message = FALSE}
 expert_ratings <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022-10-03-blog-post-4-expert-prediction-and-incumbency/04-Incumbency-9-29-/Section-data/District-level-forecast/expert_rating.csv")
 
 historical_results <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022-10-03-blog-post-4-expert-prediction-and-incumbency/04-Incumbency-9-29-/Section-data/District-level-forecast/house party vote share by district 1948-2020.csv") %>%
@@ -47,7 +48,10 @@ polls_df <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalyt
 
 ```
 
-```{r}
+
+
+
+```{r, warning = FALSE, message = FALSE}
 avg_ratings <- expert_ratings %>% 
   select(year, state, district, avg_rating)
   
@@ -63,13 +67,12 @@ dem_results_new <- incumb_dist_1948_2020_3_ %>%
 cvap_district <- cvap_district %>%
   rename(st_cd_fips = geoid) 
 
-
 polls_cvap_df <- merge(polls_df, cvap_district, by = c('st_cd_fips', 'year'))
 
 polls_cvap_vp_df <- merge(polls_cvap_df, dem_results_new, by = c('st_cd_fips', 'year')) %>%
     rename(state_name = state.x) %>%
     mutate(totalvotes = RepVotes + DemVotes,
-         turnout = totalvotes/cvap) %>%
+         turnout = (totalvotes/cvap)*100) %>%
     mutate(DemVotesMajorPct = DemVotesMajorPercent/100,
          RepVotesMajorPct = RepVotesMajorPercent/100) %>%
   #FILTER OUT UNCONTESTED SEATS
@@ -83,10 +86,17 @@ avg_ratings_clean <- avg_ratings %>%
   mutate(cd_fips = case_when(as.numeric(district) < 10 ~ paste0("0", district),
                                 TRUE ~ district)) %>%
   rename(state_name = state) %>%
+  mutate(district = case_when(
+    district == "AL" ~ "1",
+    TRUE ~ district
+  ))  %>%
   drop_na()
+  
   
 final_data <- polls_cvap_vp_df %>%
   left_join(avg_ratings_clean, by = c("state_name", "cd_fips", "year"))
+final_data$DEM <- as.numeric(final_data$DEM)
+final_data$REP <- as.numeric(final_data$REP)
 
 train_data_dem <- final_data %>%
   filter(year != 2022) %>% 
@@ -106,21 +116,200 @@ train_data_rep <- final_data %>%
 
 ```
 
-```{r, message = FALSE}
-#run democrat and republican model on respective training dataset
-modelsdem <- train_data_dem %>% 
-  mutate(modeldem = map(data, ~lm(DemVotesMajorPct ~ turnout + avg_rating + dem_status, 
+
+To begin looking at the relationship between party vote share and turnout, I graphed regressions of both the republican or democrat party vote share on turnout. The graph can be seen below. As pictured, the republican party vote share has a slight negative correlation with turnout while the democrat party vote share has a slight positive correlation with turnout. While the impact doesn't seem incredibly significant, it seems that greater turnout is a benefit for the democratic party historically. 
+
+```{r, warning = FALSE, message = FALSE}
+
+cvap_midterm %>%
+  ggplot() +
+  geom_point(aes(x = turnout, y = DemVotesMajorPercent)) +
+  geom_smooth(aes(x = turnout, y = DemVotesMajorPercent, color = "Democrats"), method = "lm") + 
+  geom_point(aes(x = turnout, y = RepVotesMajorPercent)) + 
+  geom_smooth(aes(x = turnout, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
+  xlab("Turnout Percentage") +
+  ylab("Party Vote Share") +
+  labs(title = "Linear Regression of Party Vote Share vs. Voter Turnout Percentage") +
+  scale_color_manual(name = "Regression",             # legend name
+                     values = c("Democrats" = "blue",  # map regression line colors
+                                "Republicans" = "red"))
+```
+
+With a visible relationship established, I then moved on to think a little bit more about how I could incorporate 
+
+```{r, warning = FALSE, message = FALSE}
+final_data_aggregate <- final_data %>%
+  filter(year != 2022) %>%
+  group_by(year, st_cd_fips) %>%
+  mutate(DEM = as.numeric(DEM), 
+         REP = as.numeric(REP)) %>%
+  mutate(avg_support_dem = mean(DEM), 
+         avg_support_rep = mean(REP)) 
+
+linearmodelnat <- lm(DemVotesMajorPct ~ avg_rating + dem_status + avg_support_dem + turnout, data = final_data_aggregate)
+linearmodelnat_pollrate <- lm(DemVotesMajorPct ~ avg_rating + dem_status + avg_support_dem, data = final_data_aggregate)
+stargazer(linearmodelnat, linearmodelnat_pollrate,  type = "text")
+
+```
+
+
+
+```{r}
+cvap_vp_df <- merge(dem_results_new, cvap_district, by = c('st_cd_fips', 'year'))
+
+cvap_vp_rate_df <- cvap_vp_df %>%
+  mutate(totalvotes = RepVotes + DemVotes,
+         turnout = (totalvotes/cvap)*100) %>%
+  rename(state_name = state.x, 
+         district = cd) %>%
+  left_join(avg_ratings_clean, by = c("state_name", "district", "year")) %>%
+  filter(year != 2022) %>%
+  drop_na()
+
+cvap_midterm <- cvap_vp_rate_df %>%
+  filter(year %in% c(2010, 2014, 2018))
+```
+
+```{r}
+#NATIONAL 
+modelturnout <- lm(DemVotesMajorPercent ~ turnout, cvap_vp_rate_df)
+modelturnout_incumb <- lm(DemVotesMajorPercent ~ turnout +dem_status, cvap_vp_rate_df)
+modelturnout_rate <- lm(DemVotesMajorPercent ~ turnout + avg_rating, cvap_vp_rate_df)
+modelturnout_rate_incumb <- lm(DemVotesMajorPercent ~ turnout + avg_rating + dem_status, cvap_vp_rate_df)
+modelturnout_rate_incumb_rep <- lm(RepVotesMajorPercent ~ turnout + avg_rating + rep_status, cvap_vp_rate_df)
+stargazer(modelturnout, modelturnout_incumb, modelturnout_rate_incumb, type = "text")
+
+#NATIONAL MIDTERMS
+midtermmodelturnout <- lm(DemVotesMajorPercent ~ turnout, cvap_midterm)
+midtermmodelturnout_incumb <- lm(DemVotesMajorPercent ~ turnout, cvap_midterm)
+midtermmodelturnout_rate_incumb <- lm(DemVotesMajorPercent ~ turnout + avg_rating + dem_status, cvap_midterm)
+stargazer(midtermmodelturnout, midtermmodelturnout_incumb, midtermmodelturnout_rate_incumb, type = "text")
+
+midtermmodelturnout_rate_incumb_rep <- lm(RepVotesMajorPercent ~ turnout + avg_rating + rep_status, cvap_midterm)
+```
+
+
+
+
+
+
+
+
+
+
+```{r}
+#TAKE BEST NATIONAL MODEL AND MAKE PREDICTIONS
+avg_rate_test <- avg_ratings_clean %>%
+  filter(year == 2022) %>%
+  mutate(mean(avg_rating))
+
+midtermturnout <- cvap_midterm %>%
+  mutate(mean(turnout))
+
+
+test_data <- data.frame(avg_rating = 4.070922, turnout = 47.57791, avg_support_dem = 45.3, avg_support_rep = 44.9, dem_status = 1, rep_status = 0)
+dem_vote_share <- predict(midtermmodelturnout_rate_incumb, test_data)
+
+dem_vote_share_midtermonly <- predict(midtermmodelturnout_rate_incumb, test_data)
+dem_vote_share_all <- predict(modelturnout_rate_incumb, test_data)
+rep_vote_share_midtermonly <- predict(midtermmodelturnout_rate_incumb_rep, test_data)
+rep_vote_share_all <- predict(modelturnout_rate_incumb_rep, test_data)
+
+paste("Using only midterm election years, the predicted Democrat Vote Share in the 2022 election is:", dem_vote_share_midtermonly," and the predicted Republican Vote Share is:" , rep_vote_share_midtermonly)
+
+paste("Using midterm and presidential election years, the predicted Democrat Vote Share in the 2022 election is:", dem_vote_share_all," and the predicted Republican Vote Share is:" , rep_vote_share_all)
+
+```
+
+
+
+```{r}
+
+```
+
+
+
+
+```{r}
+#DISTRICT LEVEL
+cvap_extension_train <-  cvap_vp_rate_df %>%
+  filter(year != 2022) %>% 
+  group_by(st_cd_fips) %>%
+  filter(n() > 1) %>% # Filtering out single data rows
+  drop_na() %>%
+  group_nest() %>% 
+  mutate(data = map(data, ~unnest(., cols = c())))
+
+#MAKE LINEAR MODEL
+modelsdem <- cvap_extension_train %>% 
+  mutate(modeldem = map(data, ~lm(DemVotesMajorPercent ~ turnout + avg_rating + dem_status, 
                                   data = .x))) %>%
   select(-data)
 
 model_results_dem <- modelsdem %>% 
   mutate(r_squared = map_dbl(modeldem, ~summary(.x)$r.squared))
 
-modelsdemglm <- train_data_dem %>% 
-  mutate(modeldem = map(data, ~glm(DemVotesMajorPct ~ turnout + avg_rating + dem_status, 
-                                  data = .x, family = binomial(link="logit")))) %>%
+total_rsquared <- mean(model_results_dem$r_squared)
+
+paste("The average are squared for all districts using a model that accounts for turnout, expert prediction, and democratic incumbency is", total_rsquared)
+```
+
+
+
+```{r, message = FALSE}
+#run democrat and republican model on respective training dataset
+
+modelsdemglm <- cvap_extension_train %>%
+  mutate(glmmodeldem = map(data, ~glm(cbind(DemVotesMajorPercent, (DemVotesMajorPercent+RepVotesMajorPercent)) ~ turnout + avg_rating + dem_status, data = .x, family = binomial))) %>%
   select(-data)
 
+glmmodel_results <- modelsdemglm %>%
+  mutate(mcf_r_squared = map_dbl(glmmodeldem, ~with(summary(.x), 1 - deviance/null.deviance)))
 
+
+# Predicting 2022 with model
+pred_2022 <- test_data %>%
+  # inner join as there may not be historical models for some districts
+  inner_join(models, by = c("state", "district")) %>%
+  mutate(pred = map_dbl(.x = model, .y = data, ~predict(object = .x, newdata = as.data.frame(.y),
+  type="response")[[1]])) %>%
+  select(state, district, pred)
 
 ```
+
+
+```{r}
+pred_2022 <- test_data %>%
+  # inner join as there may not be historical models for some districts
+  inner_join(models, by = c("state", "district")) %>%
+  mutate(pred = map_dbl(.x = model, .y = data, ~predict(object = .x, newdata = as.data.frame(.y),
+  type="response")[[1]])) %>%
+  select(state, district, pred)
+```
+
+```{r}
+
+
+glmmodelnat <- glm(DemVotesMajorPct ~ avg_rating + dem_status + avg_support_dem, data = final_data_aggregate)
+
+
+stargazer(linearmodelnat, glmmodelnat, type = "text")
+#finalmodels <- train_data_dem %>% 
+  #mutate(model_final = map(data, ~lm(DemVotesMajorPct ~ avg_rating + dem_status , 
+                                  #data = .x))) %>%
+  #select(-data)
+
+model_results_final <- finalmodels %>% 
+  mutate(r_squared = map_dbl(model_final, ~summary(.x)$r.squared))
+
+average_r <- mean(model_results_final$r_squared)
+
+finalmodels <- train_data_dem %>% 
+  mutate(model_final = map(data, ~lm(DemVotesMajorPct ~  + dem_status, 
+                                  data = .x))) %>%
+  select(-data)
+
+```
+
+
+
