@@ -184,7 +184,7 @@ At the top of the model making process, I needed to decide what data to include 
 
 To look at trends in turnout and two party vote share percentage, I made models by progressively adding in different covariates. My first model is a simple model using turnout to predict Democratic Vote Share. The next model I created took this basic model and added in a variable for incumbency. I then created a model by including in average of expert predictions to the other covariates used previously. Finally, the last model I added in average poll support for the party in addition to all the previously mentioned covariates. This itterative process will allow me to see the importance of various variables and help me discern which are essential for my final model. The regression table can be seen below. 
 
-```{r, warning = FALSE}
+```{r warning=FALSE}
 #NATIONAL 
 modelturnout <- lm(DemVotesMajorPercent ~ turnout, cvap_vp_rate_df)
 modelturnout_incumb <- lm(DemVotesMajorPercent ~ turnout +dem_status, cvap_vp_rate_df)
@@ -198,20 +198,22 @@ midtermmodelturnout <- lm(DemVotesMajorPercent ~ turnout, cvap_midterm)
 midtermmodelturnout_incumb <- lm(DemVotesMajorPercent ~ turnout + dem_status, cvap_midterm)
 midtermmodelturnout_rate_incumb <- lm(DemVotesMajorPercent ~ turnout + avg_rating + dem_status, cvap_midterm)
 #midtermmodelturnout_rate_incumb_rep <- lm(RepVotesMajorPercent ~ turnout + avg_rating + rep_status, cvap_midterm)
-stargazerplot <- stargazer(midtermmodelturnout, midtermmodelturnout_incumb, midtermmodelturnout_rate_incumb,linearmodelnat, type = "text", title="National Linear Models Regression Results", dep.var.labels = "Democratic Vote Percentage",
-          column.labels	= c("Turnout", "Turnout + Incumb", "Turnout + Expert Ratings", "All Midterm Covariates"),
-          covariate.labels = c("Turnout", "Expert Rating", "Incumbent Dem President", "Average Poll Support"),
-          header=FALSE, 
-          single.row = TRUE, 
-          no.space = TRUE, 
-          column.sep.width = "1pt", 
-          font.size = "small" 
-)
 
-stargazerplot
+
+#saved <- stargazer(midtermmodelturnout, midtermmodelturnout_incumb, midtermmodelturnout_rate_incumb,linearmodelnat, type = "text",
+                  # title="National Linear Models Regression Results", dep.var.labels = "Democratic Vote Percentage",
+                  # column.labels	= c("Turnout", "Turnout + Incumb", "Turnout + Expert Ratings", "All Midterm Covariates"),
+                  # covariate.labels = c("Turnout", "Expert Rating", "Incumbent Dem President", "Average Poll Support"),
+                   #header=FALSE, 
+                   #single.row = TRUE, 
+                   #no.space = TRUE, 
+                   #column.sep.width = "1pt", 
+                   #font.size = "small")
+
+
 ```
 
-
+![](/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022_10_17_blog_post_6_the_ground_game/EA Stargazer BP 6 screenshot.png)
 
 ```{r}
 #TAKE BEST NATIONAL MODEL AND MAKE PREDICTIONS
