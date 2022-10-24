@@ -92,8 +92,6 @@ tags: []
   |                                                                            
   |===========                                                           |  16%
   |                                                                            
-  |============                                                          |  16%
-  |                                                                            
   |============                                                          |  17%
   |                                                                            
   |============                                                          |  18%
@@ -156,19 +154,17 @@ tags: []
   |                                                                            
   |========================                                              |  35%
   |                                                                            
+  |=========================                                             |  35%
+  |                                                                            
+  |=========================                                             |  36%
+  |                                                                            
+  |==========================                                            |  36%
+  |                                                                            
   |==========================                                            |  37%
   |                                                                            
   |==========================                                            |  38%
   |                                                                            
   |===========================                                           |  38%
-  |                                                                            
-  |===========================                                           |  39%
-  |                                                                            
-  |============================                                          |  39%
-  |                                                                            
-  |============================                                          |  40%
-  |                                                                            
-  |============================                                          |  41%
   |                                                                            
   |=============================                                         |  41%
   |                                                                            
@@ -211,8 +207,6 @@ tags: []
   |=====================================                                 |  52%
   |                                                                            
   |=====================================                                 |  53%
-  |                                                                            
-  |=====================================                                 |  54%
   |                                                                            
   |======================================                                |  54%
   |                                                                            
@@ -378,37 +372,16 @@ Comparing the two images, it appears that experts were incredibly accurate at pr
 <p>Now that we’ve established that expert predictions in aggregate are quite close to the actual vote share percentage exhibited in historical elections, it is time to see how strong of a predictor they really are. As well as, how might incumbency play a role in our predictions as well.</p>
 <p>Before we get into the nitty gritty of the models, let’s recap that incumbency is one of the most fundamental and talked about variables that go into election predictions. But for those who don’t avidly read Nate Silver’s every tweet, you may be wondering why? So let’s first break this down.</p>
 <p>Incumbency is typically seen as an advantage but the label of being an incumbent itself isn’t necessarily the key determinant of winning on its own, rather it is the meaning behind what having held office before. Being an incumbent can lead to an advantage due to name recognition alone, but also if a candidate is viewed to have done a good job whether it be ensuring economic success or passing favorable legislation for their district. However, poor performance or coincidental measures of performance like the economy may have profoundly negative effects. As such, incumbency itself may not represent the whole picture of an electoral outcome.</p>
-<p>Building off of last week’s models, I recognized that the economic variables of performance used were not good at explaining the variation in two party vote share in an election. As such, I decided to drop this variable from my model altogether. In addition, since I knew I was bringing in expert predictions, and understood that these predictions incorporate polling heavily, I decided to throw out the general poll variable as well. As such, this week I decided to test two models: one with just average expert ratings and another with average expert ratings and incumbency. To start, (due to technical difficulties) I created one model that looks only at democrats. I’m trying to look at how democratic vote share is impacted by whether a democrat is an incumbent or not. For democrats only, the relationship between incumbency and vote shore</p>
-<p>The first model predicts democratic vote share based upon average expert ratings and incumbency. After training it on historical data for each district, the model predicted that among all districts nationally that democrats in 2022 would win yielded on average for all districts an r^2 value of 0.7814, which is the highest of all my models thus far. This says that combining expert predictions and incumbency is a promising way of explaining variation in democratic vote share percentage in an election. I believe this is likely because expert prediction is incorporating all variables that pundits have viewed to be effective in the past. Additionally,</p>
-<p><span class="math display">\[
+<p>Building off of last week’s models, I recognized that the economic variables of performance used were not good at explaining the variation in two party vote share in an election. As such, I decided to drop this variable from my model altogether. In addition, since I knew I was bringing in expert predictions, and understood that these predictions incorporate polling heavily, I decided to throw out the general poll variable as well. As such, this week I decided to test two models: one with just average expert ratings and another with average expert ratings and incumbency. To start, (due to technical difficulties) I created one model that looks only at democrats. I’m trying to look at how democratic vote share is impacted by whether a democrat is an incumbent or not.</p>
+<p>Model 1:
+<span class="math display">\[
 Democratic Vote Share = Average Expert Prediction
-\]</span></p>
-<p>$$
+\]</span>
+Model 2:
+$$
 Democratic Vote Share = Average Expert Prediction + IncumbentPresident</p>
 <p>$$</p>
-<pre><code>## 
-## ==============================================================
-##                                Dependent variable:            
-##                     ------------------------------------------
-##                              dem_votes_major_percent          
-##                             (1)                   (2)         
-## --------------------------------------------------------------
-## avg_rating                 -1.875              -2.802***      
-##                           (0.990)               (0.397)       
-##                                                               
-## dem_status                 2.984                              
-##                           (2.923)                             
-##                                                               
-## Constant                 54.132***             58.763***      
-##                           (4.800)               (1.582)       
-##                                                               
-## --------------------------------------------------------------
-## Observations                 5                     5          
-## R2                         0.963                 0.943        
-## Adjusted R2                0.925                 0.924        
-## Residual Std. Error    1.276 (df = 2)       1.285 (df = 3)    
-## F Statistic         25.725** (df = 2; 2) 49.708*** (df = 1; 3)
-## ==============================================================
-## Note:                              *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<p>The first model predicts democratic vote share based upon average expert ratings only.After training it on historical data for each district, the model predicted that among all districts nationally that democrats in 2022 would win approximately 50.0125 percent of the two party vote. On average the prediction for all districts had an average r^2 value of 0.7815. This says that combining expert predictions for an average yielded a promising way to explain the variation in election data. I believe this is likely because expert prediction is incorporating all variables that pundits have viewed to be effective in the past. Moving on to my second model, where I included both average expert prediction and a variable of demcorat incumbency, the model predicted that the Democrats would win approximately 48.28% of the two party vote, with an average r^2 value for all districts of 0.878481. This is the highest r^2 value I’ve seen in my election modeling endeavors thus far. This indicates that combining expert prediction with an incumbency variable is promising way of explaining variation in democratic vote share percentage in an election, since on average the model that includes incumbency has a higher predictive power than the one without it. As such, the model with expert prediction and the incumbency variable was the strongest. With presidential approval being such a significant portion of election theory and literature, I’m not surprised our incumbency variable improved our predictions even beyond the average of expert predictions variable.</p>
+<p>All in all, experts appear to be doing their job quite well as aggregating expert prediction on the theory of the wisdom of crowds maintains strong predictive power in the modeling of election outcomes. Taking an average rating of all expert predictions captured a good picture of future election outcomes. My only fear with this is that since oftentimes expert prediction algorithms are like a black box with unknown predictors, adding many variables on top of this covariate would lead to overfitting the model or exhibit possible collinearity among predictors. Similarly, incorporating a variable for incumbency seems to also be a good explainer of election outcomes. I will continue to include this variable in various iterations next week to test the best mode of measuring incumbency and how to use it in my predictions both nationally and at the district level moving forward.</p>
 <p>CITATIONS:
 Campbell, J. E., &amp; Mann, T. E. (2016, July 28). Forecasting the presidential election: What can we learn from the models? Brookings. Retrieved October 3, 2022, from <a href="https://www.brookings.edu/articles/forecasting-the-presidential-election-what-can-we-learn-from-the-models/" class="uri">https://www.brookings.edu/articles/forecasting-the-presidential-election-what-can-we-learn-from-the-models/</a></p>

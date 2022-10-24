@@ -119,40 +119,6 @@ train_data_rep <- final_data %>%
 
 To begin looking at the relationship between party vote share and turnout, I graphed regressions of both the republican or democrat party vote share on turnout. The graph can be seen below. As pictured, the republican party vote share has a slight negative correlation with turnout while the democrat party vote share has a slight positive correlation with turnout. While the impact doesn't seem incredibly significant, it seems that greater turnout is a benefit for the democratic party historically. 
 
-```{r, warning = FALSE, message = FALSE}
-
-cvap_midterm %>%
-  ggplot() +
-  geom_point(aes(x = turnout, y = DemVotesMajorPercent)) +
-  geom_smooth(aes(x = turnout, y = DemVotesMajorPercent, color = "Democrats"), method = "lm") + 
-  geom_point(aes(x = turnout, y = RepVotesMajorPercent)) + 
-  geom_smooth(aes(x = turnout, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
-  xlab("Turnout Percentage") +
-  ylab("Party Vote Share") +
-  labs(title = "Linear Regression of Party Vote Share vs. Voter Turnout Percentage") +
-  scale_color_manual(name = "Regression",             # legend name
-                     values = c("Democrats" = "blue",  # map regression line colors
-                                "Republicans" = "red"))
-```
-
-With a visible relationship established, I then moved on to think a little bit more about how I could incorporate 
-
-```{r, warning = FALSE, message = FALSE}
-final_data_aggregate <- final_data %>%
-  filter(year != 2022) %>%
-  group_by(year, st_cd_fips) %>%
-  mutate(DEM = as.numeric(DEM), 
-         REP = as.numeric(REP)) %>%
-  mutate(avg_support_dem = mean(DEM), 
-         avg_support_rep = mean(REP)) 
-
-linearmodelnat <- lm(DemVotesMajorPct ~ avg_rating + dem_status + avg_support_dem + turnout, data = final_data_aggregate)
-linearmodelnat_pollrate <- lm(DemVotesMajorPct ~ avg_rating + dem_status + avg_support_dem, data = final_data_aggregate)
-stargazer(linearmodelnat, linearmodelnat_pollrate,  type = "text")
-
-```
-
-
 
 ```{r}
 cvap_vp_df <- merge(dem_results_new, cvap_district, by = c('st_cd_fips', 'year'))
@@ -170,6 +136,50 @@ cvap_midterm <- cvap_vp_rate_df %>%
   filter(year %in% c(2010, 2014, 2018))
 ```
 
+
+```{r, warning = FALSE, message = FALSE}
+
+cvap_midterm %>%
+  ggplot() +
+  geom_point(aes(x = turnout, y = DemVotesMajorPercent)) +
+  geom_smooth(aes(x = turnout, y = DemVotesMajorPercent, color = "Democrats"), method = "lm") + 
+  geom_point(aes(x = turnout, y = RepVotesMajorPercent)) + 
+  geom_smooth(aes(x = turnout, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
+  xlab("Turnout Percentage") +
+  ylab("Party Vote Share") +
+  labs(title = "Linear Regression of Party Vote Share vs. Voter Turnout Percentage") +
+  scale_color_manual(name = "Regression",             # legend name
+                     values = c("Democrats" = "blue",  # map regression line colors
+                                "Republicans" = "red"))
+```
+
+With a visible relationship established, I then moved on to think a little bit more about how I could incorporate turnout into a robust model. Recently, I've also been investigated whether a district level or national level model would be my best approach. So today, I will be creating both national and district level prediction models and evaluating each. 
+
+
+```{r, warning = FALSE, message = FALSE}
+final_data_aggregate <- final_data %>%
+  filter(year != 2022) %>%
+  group_by(year, st_cd_fips) %>%
+  mutate(DEM = as.numeric(DEM), 
+         REP = as.numeric(REP)) %>%
+  mutate(avg_support_dem = mean(DEM), 
+         avg_support_rep = mean(REP)) %>%
+  rename(DemVotesMajorPercentorig = DemVotesMajorPercent) %>%
+  rename(DemVotesMajorPercent = DemVotesMajorPct)
+
+linearmodelnat_pollrate <- lm(DemVotesMajorPercent ~ avg_rating + dem_status + avg_support_dem, data = final_data_aggregate)
+linearmodelnat <- lm(DemVotesMajorPercent ~ avg_rating + dem_status + avg_support_dem + turnout, data = final_data_aggregate)
+#stargazer(linearmodelnat, linearmodelnat_pollrate,  type = "text")
+
+```
+
+
+
+
+At the top of the model making process, I needed to decide what data to include in my train set. This week I tested out whether to train the data on all elections or just midterms but concluded due to literature's remarks on the unique nature of midterm elections compared to one's influenced by national votes as well. As such, I decided to subset the data to only train my models on midterm election years this week. 
+
+To look at trends in turnout and two party vote share percentage, I made models by progressively adding in different covariates. My first model is a simple model using turnout to predict Democratic Vote Share. The next model I created took this basic model and added in a variable for incumbency. I then created a model by including in average of expert predictions to the other covariates used previously. Finally, the last model I added in average poll support for the party in addition to all the previously mentioned covariates. This itterative process will allow me to see the importance of various variables and help me discern which are essential for my final model. The regression table can be seen below. 
+
 ```{r}
 #NATIONAL 
 modelturnout <- lm(DemVotesMajorPercent ~ turnout, cvap_vp_rate_df)
@@ -177,23 +187,25 @@ modelturnout_incumb <- lm(DemVotesMajorPercent ~ turnout +dem_status, cvap_vp_ra
 modelturnout_rate <- lm(DemVotesMajorPercent ~ turnout + avg_rating, cvap_vp_rate_df)
 modelturnout_rate_incumb <- lm(DemVotesMajorPercent ~ turnout + avg_rating + dem_status, cvap_vp_rate_df)
 modelturnout_rate_incumb_rep <- lm(RepVotesMajorPercent ~ turnout + avg_rating + rep_status, cvap_vp_rate_df)
-stargazer(modelturnout, modelturnout_incumb, modelturnout_rate_incumb, type = "text")
+#stargazer(modelturnout, modelturnout_incumb, modelturnout_rate_incumb, type = "text")
 
 #NATIONAL MIDTERMS
 midtermmodelturnout <- lm(DemVotesMajorPercent ~ turnout, cvap_midterm)
-midtermmodelturnout_incumb <- lm(DemVotesMajorPercent ~ turnout, cvap_midterm)
+midtermmodelturnout_incumb <- lm(DemVotesMajorPercent ~ turnout + dem_status, cvap_midterm)
 midtermmodelturnout_rate_incumb <- lm(DemVotesMajorPercent ~ turnout + avg_rating + dem_status, cvap_midterm)
-stargazer(midtermmodelturnout, midtermmodelturnout_incumb, midtermmodelturnout_rate_incumb, type = "text")
+#midtermmodelturnout_rate_incumb_rep <- lm(RepVotesMajorPercent ~ turnout + avg_rating + rep_status, cvap_midterm)
+stargazer(midtermmodelturnout, midtermmodelturnout_incumb, midtermmodelturnout_rate_incumb,linearmodelnat, type = "text", title="National Linear Models Regression Results", dep.var.labels = "Democratic Vote Percentage",
+          column.labels	= c("Turnout", "Turnout + Incumb", "Turnout + Expert Ratings", "All Midterm Covariates"),
+          covariate.labels = c("Turnout", "Expert Rating", "Incumbent Dem President", "Average Poll Support"),
+          header=FALSE, 
+          single.row = TRUE, 
+          no.space = TRUE, 
+          column.sep.width = "3pt", 
+          font.size = "small" 
+)
 
-midtermmodelturnout_rate_incumb_rep <- lm(RepVotesMajorPercent ~ turnout + avg_rating + rep_status, cvap_midterm)
+
 ```
-
-
-
-
-
-
-
 
 
 
@@ -206,35 +218,37 @@ avg_rate_test <- avg_ratings_clean %>%
 midtermturnout <- cvap_midterm %>%
   mutate(mean(turnout))
 
+test_data_nat <- data.frame(turnout = 47.57791, 
+         avg_support_dem = 45.3,
+         mavg_support_rep = 44.9, 
+         dem_status = 1, 
+         rep_status = 0, 
+         avg_rating = 4.070922)
 
-test_data <- data.frame(avg_rating = 4.070922, turnout = 47.57791, avg_support_dem = 45.3, avg_support_rep = 44.9, dem_status = 1, rep_status = 0)
 dem_vote_share <- predict(midtermmodelturnout_rate_incumb, test_data)
 
 dem_vote_share_midtermonly <- predict(midtermmodelturnout_rate_incumb, test_data)
 dem_vote_share_all <- predict(modelturnout_rate_incumb, test_data)
-rep_vote_share_midtermonly <- predict(midtermmodelturnout_rate_incumb_rep, test_data)
-rep_vote_share_all <- predict(modelturnout_rate_incumb_rep, test_data)
+#rep_vote_share_midtermonly <- predict(midtermmodelturnout_rate_incumb_rep, test_data)
+#rep_vote_share_all <- predict(modelturnout_rate_incumb_rep, test_data)
 
-paste("Using only midterm election years, the predicted Democrat Vote Share in the 2022 election is:", dem_vote_share_midtermonly," and the predicted Republican Vote Share is:" , rep_vote_share_midtermonly)
+#paste("Using only midterm election years, the predicted Democrat Vote Share in the 2022 election is:", dem_vote_share_midtermonly," and the predicted Republican Vote Share is:" , rep_vote_share_midtermonly)
 
-paste("Using midterm and presidential election years, the predicted Democrat Vote Share in the 2022 election is:", dem_vote_share_all," and the predicted Republican Vote Share is:" , rep_vote_share_all)
-
-```
-
-
-
-```{r}
+#paste("Using midterm and presidential election years, the predicted Democrat Vote Share in the 2022 election is:", dem_vote_share_all," and the predicted Republican Vote Share is:" , rep_vote_share_all)
 
 ```
 
 
+As can be seen in the regression table, the model that had the most predictive power on the data was not the model that included all covariates but the model that combined turnout, expert ratings, and incumbency. This model had an adjusted r^2 value of 0.772 which is certainly the highest of all models I've created in this course thus far. However, when I add in polling, this adjusted r^2 value decreased down to 0.757. This highlights that sometimes adding in all variables, especially ones that are likely collinear with others, may lead to overfit and not always increase predictive power. I believe this occured in my models because expert predictions likely take into account polling and thus adding in polling again just double counts that factor. As acknwoledged in weeks prior, the blackbox nature of expert predictions does make it harder to add in other covariates without knowing if they've already been incorporated. Therefore, to predict actual vote share in the 2022 election I'm going to use the 3rd model that includes just turnout, incumbency, and expert prediction.  Looking at this model prediction, it can be seen that, similar to the scatter plot above, turnout has a small positive impact with Democratic Vote Share. When using this model to predict actual vote share, it can be estimated that using only midterm election years, the predicted Democrat Vote Share in the 2022 election is approximately 49.3689 and the predicted Republican Vote Share is approximately 50.4417. 
 
+
+In order to get a district level prediction, I took the prevailing model from my national level analysis and created a linear model to run on all districts. After building this model to predict Democratic Vote Share by looking at turnout, expert prediction, and incumbency, the model performed with an average r^2 value for all districts of 0.9549. This is the highest  r^2 value I've seen in any of my district level models thus far. However, it predicts that the Democrats will win 53.49% of the two party vote share, which is much larger than my previous models. Finally, to conclude my inquiry I also made a district level prediction using a generalized linear model. This model also received a mcfaddens r^2 value of around 0.95  but yields a prediction that the Democrats will win only approximately 34% of the two party vote share. The variation in these predictions are somwhat concerning and will require more review to understand which outputs are most reliable. I believe the high average r-squared values are coming from the incredibly small sample size per each district in these district level models. Next week, I look forward to investigating this question further. 
 
 ```{r}
 #DISTRICT LEVEL
 cvap_extension_train <-  cvap_vp_rate_df %>%
   filter(year != 2022) %>% 
-  group_by(st_cd_fips) %>%
+  group_by(st_cd_fips, state_name, cd_fips) %>%
   filter(n() > 1) %>% # Filtering out single data rows
   drop_na() %>%
   group_nest() %>% 
@@ -251,7 +265,41 @@ model_results_dem <- modelsdem %>%
 
 total_rsquared <- mean(model_results_dem$r_squared)
 
-paste("The average are squared for all districts using a model that accounts for turnout, expert prediction, and democratic incumbency is", total_rsquared)
+test_data <- avg_rate_test %>% 
+   mutate(cd_fips = case_when(as.numeric(district) < 10 ~ paste0("0", district),
+                                TRUE ~ district)) %>%
+  mutate(district = case_when(
+    district == "AL" ~ "1",
+    TRUE ~ district
+  ))  %>%
+  drop_na() %>%
+  mutate(turnout = 47.57791, 
+         avg_support_dem = 45.3,
+         mavg_support_rep = 44.9, 
+         dem_status = 1, 
+         rep_status = 0) %>%
+  group_by(state_name, cd_fips) %>% 
+  group_nest() %>% 
+  mutate(data = map(data, ~unnest(., cols = c())))
+
+# Predicting district level linear model
+pred_2022 <- test_data %>%
+  # inner join as there may not be historical models for some districts
+  inner_join(modelsdem, by = c("state_name", "cd_fips")) %>% 
+  mutate(pred = map_dbl(.x = modeldem, .y = data, ~predict(object = .x, newdata = as.data.frame(.y)))) %>%
+  select(state_name, cd_fips, pred)
+
+#paste("The average are squared for all districts using a model that accounts for turnout, expert prediction, and democratic incumbency is", total_rsquared)
+
+##AVERAGE prediction for dem vote share
+averagepred <- pred_2022 %>%
+  summarize(mean(pred)) %>% pull
+
+
+##AVERAGE R2 for w/ incumbency
+
+r2average <- model_results_dem %>%
+  summarize(mean(r_squared))
 ```
 
 
@@ -267,47 +315,23 @@ glmmodel_results <- modelsdemglm %>%
   mutate(mcf_r_squared = map_dbl(glmmodeldem, ~with(summary(.x), 1 - deviance/null.deviance)))
 
 
-# Predicting 2022 with model
-pred_2022 <- test_data %>%
+#Predicting 2022 with model
+pred_2022_glm <- test_data %>%
   # inner join as there may not be historical models for some districts
-  inner_join(models, by = c("state", "district")) %>%
-  mutate(pred = map_dbl(.x = model, .y = data, ~predict(object = .x, newdata = as.data.frame(.y),
+  inner_join(modelsdemglm, by = c("state_name", "cd_fips")) %>%
+  mutate(pred = map_dbl(.x = glmmodeldem, .y = data, ~predict(object = .x, newdata = as.data.frame(.y),
   type="response")[[1]])) %>%
-  select(state, district, pred)
+  select(state_name, cd_fips, pred)
 
-```
-
-
-```{r}
-pred_2022 <- test_data %>%
-  # inner join as there may not be historical models for some districts
-  inner_join(models, by = c("state", "district")) %>%
-  mutate(pred = map_dbl(.x = model, .y = data, ~predict(object = .x, newdata = as.data.frame(.y),
-  type="response")[[1]])) %>%
-  select(state, district, pred)
-```
-
-```{r}
+##AVERAGE prediction for dem vote share
+averagepredglm <- pred_2022_glm %>%
+  summarize(mean(pred)) %>% pull
 
 
-glmmodelnat <- glm(DemVotesMajorPct ~ avg_rating + dem_status + avg_support_dem, data = final_data_aggregate)
+##AVERAGE R2 for w/ incumbency
 
-
-stargazer(linearmodelnat, glmmodelnat, type = "text")
-#finalmodels <- train_data_dem %>% 
-  #mutate(model_final = map(data, ~lm(DemVotesMajorPct ~ avg_rating + dem_status , 
-                                  #data = .x))) %>%
-  #select(-data)
-
-model_results_final <- finalmodels %>% 
-  mutate(r_squared = map_dbl(model_final, ~summary(.x)$r.squared))
-
-average_r <- mean(model_results_final$r_squared)
-
-finalmodels <- train_data_dem %>% 
-  mutate(model_final = map(data, ~lm(DemVotesMajorPct ~  + dem_status, 
-                                  data = .x))) %>%
-  select(-data)
+r2averageglm <- glmmodel_results %>%
+  summarize(mean(mcf_r_squared))
 
 ```
 
