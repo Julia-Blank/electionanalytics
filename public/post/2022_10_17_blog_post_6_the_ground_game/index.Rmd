@@ -337,3 +337,5 @@ r2averageglm <- glmmodel_results %>%
 
 
 
+CITATION:
+Daron R. Shaw, John R. Petrocik. The Turnout Myth&nbsp;(Oxford University Press, &amp; Glock, J. (n.d.). Does high voter turnout help one party? National Affairs. Retrieved October 24, 2022, from https://www.nationalaffairs.com/publications/detail/does-high-voter-turnout-help-one-party 
