@@ -1,0 +1,32 @@
+---
+title: 'Blogpost 7: Shocks'
+author: Julia Blank
+date: '2022-10-24'
+slug: []
+categories: []
+tags: []
+---
+
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE) 
+# Loading in necessary libraries
+
+library(tidyverse)
+library(ggplot2)
+library(stargazer)
+library(janitor)
+library(readxl)
+
+library(tidyverse)
+library(ggplot2)
+library(blogdown)
+library(stargazer)
+library(readr)
+library(usmap)
+library(rmapshaper)
+library(sf)
+library(janitor)
+library(tigris)
+library(leaflet)
+
+```
