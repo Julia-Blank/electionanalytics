@@ -98,7 +98,7 @@ As can be seen in the regression table, the adjusted r-squared value for both mo
 GDPdat %>%
   ggplot(aes(x=GDP_growth_pct, y=H_incumbent_party_majorvote_pct,
              label= year)) + 
-    geom_text(size = 8) +
+    geom_text(size = 5) +
     geom_smooth(method="lm", formula = y ~ x) +
     geom_hline(yintercept=50, lty=2) +
     geom_vline(xintercept=0.00, lty=2) + # median
@@ -119,7 +119,7 @@ GDPdat %>%
 RDIdat %>%
   ggplot(aes(x=DSPIC_change_pct, y=H_incumbent_party_majorvote_pct,
              label= year)) + 
-    geom_text(size = 8) +
+    geom_text(size = 5) +
     geom_smooth(method="lm", formula = y ~ x) +
     geom_hline(yintercept=50, lty=2) +
     geom_vline(xintercept=0.00, lty=2) + # median
@@ -190,7 +190,7 @@ stargazer(fulleconmodel, type = "text",
 #RDICHANGE = -0.6
 
 data2022 <- data.frame(DSPIC_change_pct = -0.6, GDP_growth_pct = -0.6)
-predict(fulleconmodel, data2022)
+#predict(fulleconmodel, data2022)
 
 
 ```
