@@ -93,8 +93,8 @@
 ## Note:                            *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
 <p>As can be seen in the regression table, the adjusted r-squared value for both models are incredibly low. This means that both models lack predictive power. Looking at the individual covariates of GDP growth percentage and RDI growth percentage from Q7 to Q8, GDP Growth percentage has a higher p-value than RDI growth percentage but neither have a p-value below 0.05. This means that both variables are not statistically significant predictors of Incumbent Party Vote Share. These regression results make me very skeptical of the traditional wisdom that economic factors are clearly influencing voter evaluation of incumbent candidates. To look at these regression results more visually, I have plotted the regression and residual graphs for the previous models below.</p>
 <p>##GRAPH OF REGRESSION:
-<img src="http://example.org/post/2022-09-19-blogpost-2-economic-fundamentals/index_files/figure-html/unnamed-chunk-4-1.png" width="672" />
-<img src="http://example.org/post/2022-09-19-blogpost-2-economic-fundamentals/index_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+<img src="http://example.org/post/2022-09-19-blogpost-2-economic-fundamentals/index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="http://example.org/post/2022-09-19-blogpost-2-economic-fundamentals/index_files/figure-html/unnamed-chunk-5-1.png" width="672" />
 Looking at the graph of the linear regression with data points, it becomes clear that both the GDP change and RDI change regression lines don’t truly fit the data very well. As such, these covariates on their own don’t seem to explain elections very well at all. What is especially intriguing to me is that both of these regression lines have a negative slope associated with the economic indicators growth. This is saying that an improvement in economic indicators from Q7 to Q8 have a negative effect on the incumbent party’s vote share. This seems incredibly counter-intuitive.</p>
 <p>Next, lets take a look at the predictions this model yields by graphing the residuals of both the GDP and RDI models.</p>
 <p><img src="http://example.org/post/2022-09-19-blogpost-2-economic-fundamentals/index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
@@ -131,8 +131,8 @@ Looking at the graph of the linear regression with data points, it becomes clear
 ## 53.96265</code></pre>
 <p>As can be seen in the summary table of this combination model above, the model has an adjusted r-squared value of 0.146 so is fairly week. Interestingly, GDP and RDI changed over the past quarter both by -0.6% so this will be the data I use as inputs in the model. Using this data, the combination model predicts that the incumbent party in 2022 (the Democratic Party) will receive approximately 53.963% of the two party vote share. However, due to the low adjusted r-squared value I’d take this prediction with a grain of salt.</p>
 <p>Next week, I’m really looking forward to investigating other covariates the help enhance the predictive power of my model since the current economic fundamentals don’t seem like great explanations for incumbent party vote share and election outcomes.</p>
-<p>CITATIONS:
-Christopher H Achen and Larry M Bartels. Democracy for realists: Why elections do not
+<p>CITATIONS:</p>
+<p>Christopher H Achen and Larry M Bartels. Democracy for realists: Why elections do not
 produce responsive government, volume 4. Princeton University Press, 2017.</p>
 <p>Andrew Healy and Gabriel S Lenz. Substituting the end for the whole: Why voters respond
 primarily to the election-year economy. American journal of political science, 58(1):31–47,
@@ -156,7 +156,7 @@ Science Review, 106(4):685–702, 2012. ISSN 0003-0554.</p>
         		<footer>
 			
 			<span>
-			&copy; <time datetime="2022-10-24 15:04:10.065232 -0400 EDT m=&#43;0.096633900">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2022-10-24 15:18:09.681532 -0400 EDT m=&#43;0.087860076">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 

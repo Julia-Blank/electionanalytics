@@ -3,6 +3,7 @@ title: 'Blog Post 6: The Ground Game'
 author: ''
 date: '2022-10-17'
 output:
+  pdf_document: default
   html_document:
     df_print: paged
 categories: []
@@ -10,7 +11,7 @@ tags: []
 slug: []
 ---
 
-Hi everyone! We’re back this week with another set of models this time exploring the important concept of turnout. This week through building models using a measure of turnout, I’ve set out to investigate: How much does voter turnout actually explain election outcomes on average and does turnout benefit one party over another?
+Hi everyone! We’re back this week with another set of models this time exploring the important concept of turnout. This week through building models using a measure of turnout, I’ve set out to investigate: How much does voter turnout actually explain election outcomes on average and does turnout benefit one party over another?  
 
 ```{r,echo = FALSE, warning = FALSE, message = FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE) 
@@ -35,7 +36,7 @@ library(tigris)
 library(leaflet)
 ```
 
-```{r, warning = FALSE, message = FALSE}
+```{r, message = FALSE}
 expert_ratings <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022-10-03-blog-post-4-expert-prediction-and-incumbency/04-Incumbency-9-29-/Section-data/District-level-forecast/expert_rating.csv")
 
 historical_results <- read_csv("/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022-10-03-blog-post-4-expert-prediction-and-incumbency/04-Incumbency-9-29-/Section-data/District-level-forecast/house party vote share by district 1948-2020.csv") %>%
@@ -183,7 +184,7 @@ At the top of the model making process, I needed to decide what data to include 
 
 To look at trends in turnout and two party vote share percentage, I made models by progressively adding in different covariates. My first model is a simple model using turnout to predict Democratic Vote Share. The next model I created took this basic model and added in a variable for incumbency. I then created a model by including in average of expert predictions to the other covariates used previously. Finally, the last model I added in average poll support for the party in addition to all the previously mentioned covariates. This itterative process will allow me to see the importance of various variables and help me discern which are essential for my final model. The regression table can be seen below. 
 
-```{r}
+```{r, warning = FALSE}
 #NATIONAL 
 modelturnout <- lm(DemVotesMajorPercent ~ turnout, cvap_vp_rate_df)
 modelturnout_incumb <- lm(DemVotesMajorPercent ~ turnout +dem_status, cvap_vp_rate_df)
@@ -228,10 +229,10 @@ test_data_nat <- data.frame(turnout = 47.57791,
          rep_status = 0, 
          avg_rating = 4.070922)
 
-dem_vote_share <- predict(midtermmodelturnout_rate_incumb, test_data)
+dem_vote_share <- predict(midtermmodelturnout_rate_incumb, test_data_nat)
 
-dem_vote_share_midtermonly <- predict(midtermmodelturnout_rate_incumb, test_data)
-dem_vote_share_all <- predict(modelturnout_rate_incumb, test_data)
+dem_vote_share_midtermonly <- predict(midtermmodelturnout_rate_incumb, test_data_nat)
+dem_vote_share_all <- predict(modelturnout_rate_incumb, test_data_nat)
 #rep_vote_share_midtermonly <- predict(midtermmodelturnout_rate_incumb_rep, test_data)
 #rep_vote_share_all <- predict(modelturnout_rate_incumb_rep, test_data)
 

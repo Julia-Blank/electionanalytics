@@ -22,7 +22,8 @@
       <pubDate>Mon, 17 Oct 2022 00:00:00 +0000</pubDate>
       
       <guid>http://example.org/post/2022_10_17_blog_post_6_the_ground_game/</guid>
-      <description></description>
+      <description>Hi everyone! We’re back this week with another set of models this time exploring the important concept of turnout. This week through building models using a measure of turnout, I’ve set out to investigate: How much does voter turnout actually explain election outcomes on average and does turnout benefit one party over another?
+To begin looking at the relationship between party vote share and turnout, I graphed regressions of both the republican or democrat party vote share on turnout.</description>
     </item>
     
     <item>
