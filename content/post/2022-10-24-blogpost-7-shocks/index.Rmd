@@ -159,7 +159,15 @@ bestnational_all<- lm(DemVotesMajorPercent ~ turnout + avg_rating + dem_status, 
 
 bestnational_midterm <- lm(DemVotesMajorPercent ~ turnout + avg_rating + dem_status, cvap_midterm)
 
-stargazer(bestnational_all,bestnational_midterm, type = "text")
+stargazer(bestnational_all,bestnational_midterm, type = "text",
+          column.labels = c("All election years model", "Midterm years model"),
+          covariate.labels = c("Turnout", "Expert Rating", "Incumbent Dem President"),
+          header=FALSE,
+          single.row = TRUE,
+          no.space = TRUE,
+          column.sep.width = "1pt",
+          font.size = "small")
+          
 ```
 
 
@@ -203,21 +211,25 @@ seatsinteractlm <- lm(DemVotesMajorPercent ~ turnout + avg_rating + dem_status +
 seatsnoturnoutlm <- lm(DemVotesMajorPercent ~ avg_rating + dem_status + d_seats_up + dem_status*d_seats_up, seatsfinal)
 
 
-stargazer(seatssimple, seatsinteractlm, type = "text",
-          title="Seats Linear Models Regression Results", dep.var.labels = "Democratic Vote Percentage",
-          column.labels	= c("Seats Inclusive Model", "Seat Interaction Model"),
-          covariate.labels = c("Turnout", "Expert Rating", "Incumbent Dem President", 'Dem Seats', "Interaction of sitting party president and seats"),
-          header=FALSE,
-          single.row = TRUE,
-          no.space = TRUE,
-          column.sep.width = "1pt",
-          font.size = "small")
+#stargazer(seatssimple, seatsinteractlm, type = "text",
+          #title="Seats Linear Models Regression Results", dep.var.labels = "Democratic Vote Percentage",
+          #column.labels	= c("Seats Inclusive Model", "Seat Interaction Model"),
+          #covariate.labels = c("Turnout", "Expert Rating", "Incumbent Dem President", 'Dem Seats', "Interaction of sitting party president and seats"),
+         # header=FALSE,
+         # single.row = TRUE,
+          #no.space = TRUE,
+          #column.sep.width = "1pt",
+          #font.size = "small")
 
 
 #seatsrep <- lm(RepVotesMajorPercent ~ turnout + avg_rating + rep_status + r_seats_up , seatsfinal)
 
 #stargazer(seatsrep, type = "text")
 ```
+
+
+![](/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022-10-24-blogpost-7-shocks/bp7 ss1.png)
+
 
 As can be seen in the models above adding in seats does improve both the r-squared and adjusted r-squared measures of the model. In the first model, I just added the number of democratic seats as an addition variable to my base model. This yielded an adjusted r-squared value of 0.737 which is a marginal improvement on the adjusted r-squared value of 0.720 from my previous national model tested on both midterm and presidential election years. Interestingly, in the model, the incumbent president variable decreased in significance. Additionally, I thought especially for midterm elections that whether the sitting president is from a specific party might have influence on the effect of seats to defend in the house. As such, I created a second model that is the same as the first but now includes an interaction term between number of democratic seats to defend and the incumbent president variable. This interaction term is somewhat significant with a p-value less than 0.05. The resulting model has the highest adjusted r-squared of an national level model tested on all election years that I've made. However, this model is only mildly 0.03 more in adjusted r-squared than the one with just seats alone. Moving forward, I'm going to look at the tradeoffs of generalization versus accuracy in these models to decide on which to use.    
 
