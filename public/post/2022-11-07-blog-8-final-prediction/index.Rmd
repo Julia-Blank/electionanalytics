@@ -30,6 +30,8 @@ library(janitor)
 library(tigris)
 library(leaflet)
 library(gridExtra)
+library(grid)
+library(ggthemes)
 ```
 
 ```{r, warning = FALSE, message = FALSE}
@@ -140,7 +142,7 @@ The model predicts the dependent variable of Democratic Two Party Vote Share bas
 
 ![](/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022-11-07-blog-8-final-prediction/Screen Shot 2022-11-07 at 1.07.31 PM.png)
 
-#Strategic and Academic Considerations
+**Strategic and Academic Considerations**
 
 When determining these 5 variables as my predictors, I think my main focus was creating a model that balanced being accurate on train data and being generalizable on new data like the uncertain midterm election. As such, I focused most on understanding how my model could capture the variation in elections holistically by looking at major themes across all elections but most importantly the 2022 midterm.
 
@@ -154,7 +156,7 @@ All in all, holistically looking at historical literature and contemporary writi
 
 
 
-#Examining Predictor Relationships Individually
+**Examining Predictor Relationships Individually**
 ```{r}
 ##GRAPH INDEPENDENT VARIABLES RELATIONSHIP INDIVIDUALLY 
 
@@ -166,7 +168,7 @@ turnout_gg <-training_data_vote %>%
   geom_smooth(aes(x = turnout, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
   xlab("Turnout Percentage") +
   ylab("Party Vote Share") +
-  labs(title = "Linear Regression of Party Vote Share vs. Voter Turnout Percentage") +
+  labs(title = "Party Vote Share vs. Voter Turnout Percentage") +
   scale_color_manual(name = "Regression",             # legend name
                      values = c("Democrats" = "blue",  # map regression line colors
                                 "Republicans" = "red")) +
@@ -180,7 +182,7 @@ turnout_gg <-training_data_vote %>%
   geom_smooth(aes(x = avg_rating, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
   xlab("Expert Rating Percentage") +
   ylab("Party Vote Share") +
-  labs(title = "Linear Regression of Party Vote Share vs. Expert Rating") +
+  labs(title = "Party Vote Share vs. Expert Rating") +
   scale_color_manual(name = "Regression",             # legend name
                      values = c("Democrats" = "blue",  # map regression line colors
                                 "Republicans" = "red")) +
@@ -189,13 +191,13 @@ turnout_gg <-training_data_vote %>%
  
  dem_status_gg <-training_data_vote %>%
   ggplot() + 
-  geom_point(aes(x = dem_status, y = DemVotesMajorPercent)) +
+  geom_point(aes(x = dem_status, y = DemVotesMajorPercent, color = "light blue", alpha = 0.5)) +
   geom_smooth(aes(x = dem_status, y = DemVotesMajorPercent, color = "Democrats"), method = "lm") + 
   geom_point(aes(x = rep_status, y = RepVotesMajorPercent)) + 
   geom_smooth(aes(x = rep_status, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
   xlab("Presidential Party Incumbency Percentage") +
   ylab("Party Vote Share") +
-  labs(title = "Linear Regression of Party Vote Share vs. Presidential Party Incumbency") +
+  labs(title = "Party Vote Share vs. Presidential Party Incumbency") +
   scale_color_manual(name = "Regression",             # legend name
                      values = c("Democrats" = "blue",  # map regression line colors
                                 "Republicans" = "red")) +
@@ -204,13 +206,13 @@ turnout_gg <-training_data_vote %>%
   
 genericballot_gg<-training_data_vote %>%
   ggplot() + 
-  geom_point(aes(x = gbavg_dem, y = DemVotesMajorPercent)) +
+  geom_point(aes(x = gbavg_dem, y = DemVotesMajorPercent, color = "light blue", alpha = 0.5)) +
   geom_smooth(aes(x = gbavg_dem, y = DemVotesMajorPercent, color = "Democrats"), method = "lm") + 
   geom_point(aes(x = gbavg_rep, y = RepVotesMajorPercent)) + 
   geom_smooth(aes(x = gbavg_rep, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
   xlab("Generic Ballot Averages") +
   ylab("Party Vote Share") +
-  labs(title = "Linear Regression of Party Vote Share vs. Generic Ballot Averages") +
+  labs(title = "Party Vote Share vs. Generic Ballot Averages") +
   scale_color_manual(name = "Regression",             # legend name
                      values = c("Democrats" = "blue",  # map regression line colors
                                 "Republicans" = "red")) +
@@ -219,22 +221,24 @@ genericballot_gg<-training_data_vote %>%
 
 seatsup_gg <- training_data_vote %>%
   ggplot() + 
-  geom_point(aes(x = d_seats_up, y = DemVotesMajorPercent, color = "blue2")) +
+  geom_point(aes(x = d_seats_up, y = DemVotesMajorPercent, color = "light blue", alpha = 0.3)) +
   geom_smooth(aes(x = d_seats_up, y = DemVotesMajorPercent, color = "Democrats"), method = "lm") + 
-  geom_point(aes(x = r_seats_up, y = RepVotesMajorPercent, color = "red2")) + 
+  geom_point(aes(x = r_seats_up, y = RepVotesMajorPercent, color = "light red"), alpha = 0.3) + 
   geom_smooth(aes(x = r_seats_up, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
   xlab("Current Seats Held by Party") +
   ylab("Party Vote Share") +
-  labs(title = "Linear Regression of Party Vote Share vs. Generic Ballot Averages") +
+  labs(title = "Party Vote Share vs. Generic Ballot Averages") +
   scale_color_manual(name = "Regression",             # legend name
                      values = c("Democrats" = "blue",  # map regression line colors
-                                "Republicans" = "red")) +
+                                "Republicans" = "red",
+                                "light blue" = "light blue",
+                                "light red" = "salmon")) +
   theme_classic()
 
-grid.arrange(turnout_gg, expertrating_gg, dem_status_gg, genericballot_gg, seatsup_gg, nrow = 3)
+grid.arrange(turnout_gg, expertrating_gg, dem_status_gg, genericballot_gg, seatsup_gg, nrow = 3, top=textGrob("Linear Regression of Party Vote Share vs. Predictors"))
 ```
 
-
+As can be seen above 
 
 
 #Model Results 
@@ -244,12 +248,11 @@ grid.arrange(turnout_gg, expertrating_gg, dem_status_gg, genericballot_gg, seats
 #repseatssimple <- lm(RepVotesMajorPercent~ turnout + avg_rating + rep_status + r_seats_up , training_data)
 gbincludedseats <- lm(DemVotesMajorPercent ~ avg_rating + gbavg_dem + dem_status + d_seats_up + turnout, training_data_vote)
 gbincludedseatsrep <- lm(RepVotesMajorPercent ~ avg_rating + gbavg_dem + dem_status + d_seats_up + turnout, training_data_vote)
-
 #seatshareattempt <- lm(seatsharedem ~ turnout + avg_rating + dem_status + d_seats_up + gbavg_dem, seatshare)
 
 stargazer(gbincludedseats, type = "text",
           column.labels = c("Final Election Prediction"),
-          covariate.labels = c("Expert Rating", "Incumbent Dem President", "Dem Status", "Dem Seats", "Turnout"),
+          covariate.labels = c("Expert Rating", "Generic Ballot Democrat Percent", "Incumbent Democrat President", "Dem Seats", "Turnout"),
           dep.var.labels = "Democratic Vote Percentage",
           header=FALSE,
           single.row = TRUE,
@@ -258,11 +261,17 @@ stargazer(gbincludedseats, type = "text",
           font.size = "small")
 ```
 
-1. **Average Expert Prediction Rating**:
-2. **Generic Ballot Democrat Percentage**: 
-3. **Incumbent Democratic President**: 
-4. **Democratic Seats to Defend**: 
-5. **Turnout**: 
+As can be seen in the stargazer above, every variable is significant at the 99% confidence interval with a p-value less than 0.01. 
+
+1. **Average Expert Prediction Rating**: In my model, average expert rating has a coefficient of **-3.059**. This can be interpreted as for any increase in one point of expert rating, the predicted Democratic Two Party Vote Share Percentage decreases by -3.059. This makes sense since an increase in a point on the scale of expert ratings increases the experts confidence in how solidly Republican a region is. 
+
+2. **Generic Ballot Democrat Percentage**: In my model, generic ballot democrat percentage has a coefficient of **0.459**. This can be interpreted as for every increase in 1 percentage for the average democrat percentage of generic ballots taken with 30 days of the election, there is an approximate 0.459 increase in Democratic Vote Share Percentage. This makes sense since 
+
+3. **Incumbent Democratic President**: In my model, the incumbent democrat president variable (dem_status) has a coefficient of as a coefficient of **-0.644**. This means that if a sitting president is a Democrat, then the house Democratic Two Party Vote Share will approximately decrease by 0.644 percent. Given the nature of midterm elections, which are often referendums on the sitting president and his status quo, this negative coefficient makes sense. 
+
+4. **Democratic Seats to Defend**: In my model, the democratic seats to defend variable (dem seats) has a coefficient of **-0.064**. This means that for every additional seat the democrats currently hold and must defend in the house, their Democrat Vote Share percentage will decrease by approximately 0.064.
+
+5. **Turnout**: In my model, the turnout variable has a coefficient of **-0.044**. This means that for every increase in one percent of turnout the democratic vote percentage decreases by -0.044 percent. While this coefficient does seem dubious given the small positive correlation between turnout and democratic vote share, in conjunction with the rest of my model perhaps turnout is being used to adjust vote percentage along with other variables. 
 
 
 ```{r}
@@ -346,6 +355,7 @@ grid.arrange(turnout_gg, expertrating_gg, dem_status_gg, genericballot_gg, seats
 
 
 # MODEL PREDICTION 
+
 ```{r}
 ## VOTE share Predictions
 
@@ -412,8 +422,10 @@ regressionprediction <-preddata %>%
   geom_text() +
   xlab("Predicted Democratic Vote Share") +
   ylab("Actual Democratic Vote Share") +
-  labs(title = "Model Prediction") 
+  labs(title = "Model Prediction Accuracy") + 
+  theme_economist()
 
+regressionprediction
 ```
 
 

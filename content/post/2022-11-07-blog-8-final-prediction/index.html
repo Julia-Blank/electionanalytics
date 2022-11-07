@@ -18,46 +18,49 @@ tags: []
 4. <strong>Democratic Seats to Defend</strong>: the number of seats the democrats currently hold in the house
 5. <strong>Turnout</strong>: the percentage of voters that cast a vote in a given district</p>
 <p><img src="Screen%20Shot%202022-11-07%20at%201.07.31%20PM.png" /></p>
-<p>#Strategic and Academic Considerations</p>
+<p><strong>Strategic and Academic Considerations</strong></p>
 <p>When determining these 5 variables as my predictors, I think my main focus was creating a model that balanced being accurate on train data and being generalizable on new data like the uncertain midterm election. As such, I focused most on understanding how my model could capture the variation in elections holistically by looking at major themes across all elections but most importantly the 2022 midterm.</p>
 <p>From reading contemporary articles about how voters are framing this election, very little has to do with each individual candidate’s plans for their constituents and centers much more on the dynamics between the two party’s. According to recent research conducted by the pew research center, voters feel both Republican and Democrat candidates have done an incredibly poor job at explaining their plans for the country. Instead, the election has been framed much more about how voters feel about the Democrat party remaining in control as they have since 2020. As such, most of the predictors I chose worked to shape or help explain voters views on the Democratic party. For instance, I included the indicator variable that represented when a president is currently a democrat or not. This variable allows my model to capture the influence of having a sitting democrat president on voter sentiment. Traditional theorists believe that oftentimes people’s votes for a sitting President’s party in midterms reflects their opinions of the status quo and so the party absorbs this sentiment in downballot races like the house. (Skelley and Rakich) Similarly, incorporating the results of generic ballots close within 30 days of an election allows me to have my model include a general temperature check of people’s feelings about the party close to election day and measure its impact on election day party vote share.</p>
 <p>It is important to note that I had significant limitations on the amount of data I personally had access to. Since I fundamentally believe in the wisdom of crowds, I decided to make average expert rating a predictor in my variable. Experts forecasting elections and party lean have access to data behind pay walls and more advanced research methods. In addition, their models incorporate more advanced techniques and niche data that were beyond my capabilities to use and access in this course. As such, I found aggregating multiple expert forecasts on district lean served to be a helpful variable to try in my model. While at first I was skeptical about the potentially black box nature of this predictor, week after week it has performed well in my model and I feel pretty confident having the humility to defer to expert predictions in this sphere will serve me well in my final prediction.</p>
 <p>Additionally, I included turnout and number of seats the Democratic Party had in the house to defend in an election. While turnout typically has a statistically minimal effect, in tight races I do believe it will be important for Democrats looking to boost party vote share. Looking at correlation it has been After reading a paper by John T. Wooley, I was positively encouraged by the capability of current democratic seats in the house to explain election outcomes. Hist theory posits that the larger the number of seats that the party has currently to defend, the less successful they will be and the lower the their party vote share might be. For starters, with finite resources party’s can only support so many candidates successfully and more importantly, the fewer seats the party holds the fewer it has to lose.</p>
 <p>All in all, holistically looking at historical literature and contemporary writings that posit the narrative of this midterm election have significantly contributed to my choice of predictors for this final model. Since I explained some of the theory behind their selection, I figured it would similarly be helpful to see the correlation of each variable on its own to party vote share. As such, I plotted each predictor against two party vote share in the graph below.</p>
-<p>#Examining Predictor Relationships Individually
+<p><strong>Examining Predictor Relationships Individually</strong>
 <img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>As can be seen above</p>
 <p>#Model Results</p>
 <pre><code>## 
-## ===================================================
-##                             Dependent variable:    
-##                         ---------------------------
-##                         Democratic Vote Percentage 
-##                          Final Election Prediction 
-## ---------------------------------------------------
-## Expert Rating                -3.059*** (0.029)     
-## Incumbent Dem President      0.459*** (0.021)      
-## Dem Status                   -0.644*** (0.123)     
-## Dem Seats                    -0.064*** (0.003)     
-## Turnout                      -0.044*** (0.004)     
-## Constant                     55.546*** (0.881)     
-## ---------------------------------------------------
-## Observations                       5,795           
-## R2                                 0.761           
-## Adjusted R2                        0.761           
-## Residual Std. Error          2.878 (df = 5789)     
-## F Statistic             3,694.777*** (df = 5; 5789)
-## ===================================================
-## Note:                   *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+## ===========================================================
+##                                     Dependent variable:    
+##                                 ---------------------------
+##                                 Democratic Vote Percentage 
+##                                  Final Election Prediction 
+## -----------------------------------------------------------
+## Expert Rating                        -3.059*** (0.029)     
+## Generic Ballot Democrat Percent      0.459*** (0.021)      
+## Incumbent Democrat President         -0.644*** (0.123)     
+## Dem Seats                            -0.064*** (0.003)     
+## Turnout                              -0.044*** (0.004)     
+## Constant                             55.546*** (0.881)     
+## -----------------------------------------------------------
+## Observations                               5,795           
+## R2                                         0.761           
+## Adjusted R2                                0.761           
+## Residual Std. Error                  2.878 (df = 5789)     
+## F Statistic                     3,694.777*** (df = 5; 5789)
+## ===========================================================
+## Note:                           *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+<p>As can be seen in the stargazer above, every variable is significant at the 99% confidence interval with a p-value less than 0.01.</p>
 <ol style="list-style-type: decimal">
-<li><strong>Average Expert Prediction Rating</strong>:</li>
-<li><strong>Generic Ballot Democrat Percentage</strong>:</li>
-<li><strong>Incumbent Democratic President</strong>:</li>
-<li><strong>Democratic Seats to Defend</strong>:</li>
-<li><strong>Turnout</strong>:</li>
+<li><p><strong>Average Expert Prediction Rating</strong>: In my model, average expert rating has a coefficient of <strong>-3.059</strong>. This can be interpreted as for any increase in one point of expert rating, the predicted Democratic Two Party Vote Share Percentage decreases by -3.059. This makes sense since an increase in a point on the scale of expert ratings increases the experts confidence in how solidly Republican a region is.</p></li>
+<li><p><strong>Generic Ballot Democrat Percentage</strong>: In my model, generic ballot democrat percentage has a coefficient of <strong>0.459</strong>. This can be interpreted as for every increase in 1 percentage for the average democrat percentage of generic ballots taken with 30 days of the election, there is an approximate 0.459 increase in Democratic Vote Share Percentage. This makes sense since</p></li>
+<li><p><strong>Incumbent Democratic President</strong>: In my model, the incumbent democrat president variable (dem_status) has a coefficient of as a coefficient of <strong>-0.644</strong>. This means that if a sitting president is a Democrat, then the house Democratic Two Party Vote Share will approximately decrease by 0.644 percent. Given the nature of midterm elections, which are often referendums on the sitting president and his status quo, this negative coefficient makes sense.</p></li>
+<li><p><strong>Democratic Seats to Defend</strong>: In my model, the democratic seats to defend variable (dem seats) has a coefficient of <strong>-0.064</strong>. This means that for every additional seat the democrats currently hold and must defend in the house, their Democrat Vote Share percentage will decrease by approximately 0.064.</p></li>
+<li><p><strong>Turnout</strong>: In my model, the turnout variable has a coefficient of <strong>-0.044</strong>. This means that for every increase in one percent of turnout the democratic vote percentage decreases by -0.044 percent. While this coefficient does seem dubious given the small positive correlation between turnout and democratic vote share, in conjunction with the rest of my model perhaps turnout is being used to adjust vote percentage along with other variables.</p></li>
 </ol>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <div id="model-prediction" class="section level1">
 <h1>MODEL PREDICTION</h1>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <p>#TESTING</p>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-9-1.png" width="672" />
 - errors are apporximately normally distributed. but sligtly left skewed</p>
