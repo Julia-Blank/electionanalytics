@@ -159,8 +159,6 @@ Additionally, I included turnout and number of seats the Democratic Party had in
 
 All in all, holistically looking at historical literature and contemporary writings that posit the narrative of this midterm election have significantly contributed to my choice of predictors for this final model. Since I explained some of the theory behind their selection, I figured it would similarly be helpful to see the correlation of each variable on its own to party vote share. As such, I plotted each predictor against two party vote share in the graph below. 
 
-
-
 **Examining Predictor Relationships Individually**
 ```{r}
 ##GRAPH INDEPENDENT VARIABLES RELATIONSHIP INDIVIDUALLY 
@@ -185,9 +183,9 @@ turnout_gg <-training_data_vote %>%
   geom_smooth(aes(x = avg_rating, y = DemVotesMajorPercent, color = "Democrats"), method = "lm") + 
   geom_point(aes(x = avg_rating, y = RepVotesMajorPercent)) + 
   geom_smooth(aes(x = avg_rating, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
-  xlab("Expert Rating Percentage") +
+  xlab("Expert Rating") +
   ylab("Party Vote Share") +
-  labs(title = "Expert Rating") +
+  labs(title = "Average Expert Rating") +
   scale_color_manual(name = "Regression",             # legend name
                      values = c("Democrats" = "blue",  # map regression line colors
                                 "Republicans" = "red")) +
@@ -196,7 +194,7 @@ turnout_gg <-training_data_vote %>%
  
  dem_status_gg <-training_data_vote %>%
   ggplot() + 
-  geom_point(aes(x = dem_status, y = DemVotesMajorPercent, color = "light blue", alpha = 0.5)) +
+  geom_point(aes(x = dem_status, y = DemVotesMajorPercent)) +
   geom_smooth(aes(x = dem_status, y = DemVotesMajorPercent, color = "Democrats"), method = "lm") + 
   geom_point(aes(x = rep_status, y = RepVotesMajorPercent)) + 
   geom_smooth(aes(x = rep_status, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
@@ -238,13 +236,12 @@ seatsup_gg <- training_data_vote %>%
                                 "Republicans" = "red")) +
   theme_classic()
 
-grid.arrange(turnout_gg, expertrating_gg, dem_status_gg, genericballot_gg, seatsup_gg, nrow = 3, top=textGrob("Linear Regression of Party Vote Share vs. Predictors"))
+grid.arrange(expertrating_gg, genericballot_gg, dem_status_gg, seatsup_gg, turnout_gg,  nrow = 3, top=textGrob("Linear Regression of Party Vote Share vs. Predictors"))
 ```
 
-As can be seen above 
+In the graph above, each predictors in my model can be seen and regressed against two party vote percentage for each party on its own. A few interesting trends and cautions can be gleaned from the above plot. Average expert rating seems to have a very clear and strong correlation likely due to the ordinal nature of the variable. As expert rating approaches 7, the republican vote share increases and as it approaches 1 democratic vote share increases. Similarly, both Republicans and Democrats see a decrease in party vote share when they hold more seats to defend in the house. Unfortunately, voter turnout does not seem to have a ver strong correlation with party vote share on its own. Finally, since presidential party incumbency status is a binary variable, the linear regression graph does not appear to display the influence very well although there does appear to be presidential party incumbency advantage (perhaps this has to do with both midterm and election years being included). All in all, these regression plots do reduce some of my confidence in the variables I've chosen individually but I do believe in tandem they can be very descriptive of the election.  
 
-
-#Model Results 
+**Model Results**
 
 ```{r, warning = FALSE, message = FALSE}
 #seatssimple <- lm(DemVotesMajorPercent ~ turnout + avg_rating + dem_status + d_seats_up , training_data)
@@ -277,7 +274,7 @@ As can be seen in the stargazer above, every variable is significant at the 99% 
 5. **Turnout**: In my model, the turnout variable has a coefficient of **-0.044**. This means that for every increase in one percent of turnout the democratic vote percentage decreases by -0.044 percent. While this coefficient does seem dubious given the small positive correlation between turnout and democratic vote share, in conjunction with the rest of my model perhaps turnout is being used to adjust vote percentage along with other variables. 
 
 
-# MODEL PREDICTION
+**MODEL PREDICTION**
 
 Ultimately, the goal of creating the model is to then predict the outcome of tomorrow's 2022 midterm election in the house. As discussed earlier, I aim to predict two party vote share in the house. After wrangling the data for 2022 as of 11/07, **my model predicts that democrats will win approximately 46.84% of the two party vote share while Republicans will win 53.16% of the two party vote share for the house**. At a 95% confidence interval, my model's lower bound for democrat vote share percentage is approximately 41.2% while the upper bound is 52.49%. While this prediction may seem wide, it does seem on trend with the conversation going on in the election world even as of today. According to today's New York Times article, the election seems incredibly close and could swing either way despite a significantly easier path to House dominance by the Republican party. As such, I think this model's conclusion is fair and a likely outcome. However, to more formally analyze the validity of this model I used both in sample and out of sample metrics of evaluation. 
 
@@ -412,19 +409,19 @@ outsamp_pred <- predict(mod,
 crossvalerror <- mean(outsamp_pred - training_data_vote$DemVotesMajorPercent[training_data_vote$year %in% years_outsamp])
 ```
 
-#LIMITATIONS
+**LIMITATIONS**
 
 Overall, my largest limitation was definitely sample size. Statistics has shown time and time again that with small sample size comes increased bias and weaker models. House election data is very hard to find and even more so on a district level. My model got limited by the average expert predictions variable which didn't have data points before 2010. As such, my model didn't have enough elections to train on. This is one of the reasons I chose to use a national level model that aggregates district data into one prediction model rather than a district level model that contains an individual predictive model for each district and then aggregates each prediction, as each district only had 1-2 data points. Additionally, since my data predicts overall two party vote share, who actually controls the House and by how many seats could be different from dominance in my prediction. Without clear means for accounting for redistricting in my national level model, I felt efforts to tackle seat share predictions may not be sufficient or valuable. Overall, I'm proud of what I have put together but am incredibly cognizant that my models predictive power could be higher. 
 
 
 
 
-#CONCLUSION
+**CONCLUSION**
 
 All in all, I'm eagerly awaiting election results and do believe my model has accurately predicted Republican dominance of the two party vote share. In reflecting on my model, I chose to present my national level prediction in its simplest form rather than one of my more technically advanced or flashy models made such as a pooled district model. Following the advice of Gary C. Jacobson, I chose to go for a simpler more robust model rather than a technical but data sparse model. I hope I made the right choice but looking at my final predictions of 46.84% for the Democratic Two Party Vote Share versus the 53.16% for Republicans, I feel fairly confident in the results. Ultimately, looking at the themes of this election, it feels as thought decisions are going to be made by reviewing sentiments towards the Democratic Party in the past two years instead of on a candidate by candidate or race by race basis. I look forward to evaluating this theory post election day and dissecting the psychological components and motivators behind the electoral outcome soon.
 
 
-#CITATIONS: 
+**CITATIONS:**
 
 Geoffreyvs. (2022, January 3). Why the president's party almost always has a bad midterm. FiveThirtyEight. Retrieved November 7, 2022, from https://fivethirtyeight.com/features/why-the-presidents-party-almost-always-has-a-bad-midterm/ 
 
