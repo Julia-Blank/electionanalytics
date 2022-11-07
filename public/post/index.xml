@@ -6,7 +6,17 @@
     <description>Recent content in Posts on My New Hugo Site</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 24 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 07 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Blog 8: Final Prediction</title>
+      <link>http://example.org/post/2022-11-07-blog-8-final-prediction/</link>
+      <pubDate>Mon, 07 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://example.org/post/2022-11-07-blog-8-final-prediction/</guid>
+      <description>TLDR; If you read nothing else, my model predicts that democrats will win approximately 46.8427% of the two party vote share while Republicans will win 53.16% of the two party vote share for the House midterm election in 2022.
+Hi everyone! We’re back this week and ready for election day! This is the last stop on my election prediction journey and so I will take the time to synthesize my findings from the past 7 weeks to formally supply an estimation of the two party vote share outcome for the 2022 midterm elections.</description>
+    </item>
+    
     <item>
       <title>Blogpost 7: Shocks</title>
       <link>http://example.org/post/2022-10-24-blogpost-7-shocks/</link>

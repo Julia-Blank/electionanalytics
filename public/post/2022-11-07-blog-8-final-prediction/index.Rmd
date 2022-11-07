@@ -127,17 +127,22 @@ seatshare <- training_data_vote %>%
                                   TRUE ~ 0))
 
 ```
-
+**TLDR; If you read nothing else, my model predicts that democrats will win approximately 46.8427% of the two party vote share while Republicans will win 53.16% of the two party vote share for the House midterm election in 2022.**
 
 Hi everyone! We’re back this week and ready for election day! This is the last stop on my election prediction journey and so I will take the time to synthesize my findings from the past 7 weeks to formally supply an estimation of the two party vote share outcome for the 2022 midterm elections. Today, I will walk you through every step of my process from variable consideration, to model evaluation, to prediction. I hope through reading this blog you will be able to understand how I've thought through the election and ways to make a robust model.
 
 To start, after trying numerous methods, I decided to maximize interpretability and robustness of data by doing a national level model instead of a district level model. While doing a district level model definitely has some benefits when coming to predict seat share, I valued having a larger sample size to work with in my data over other advantages. My district level model data felt sparse which I think would hurt its predictive power when it encounters new data. As such, my model aggregates all variables on a national scale for a two party vote share prediction. 
 
 The model predicts the dependent variable of Democratic Two Party Vote Share based on 5 predictors:
+
 1. **Average Expert Prediction Rating**: the average expert rating of the political lean of a district (1-solidly Democratic - 7 solidly Republican)
+
 2. **Generic Ballot Democrat Percentage**: the average generic ballot for democrats reported within 30 days of election 
+
 3. **Incumbent Democratic President**: an indicator variable (1 or 0) that is 1 when the sitting president is a Democrat and 0 otherwise. 
+
 4. **Democratic Seats to Defend**: the number of seats the democrats currently hold in the house
+
 5. **Turnout**: the percentage of voters that cast a vote in a given district
 
 ![](/Users/juliablank/Documents/GOV 50 PROJECTS/electionanalytics/content/post/2022-11-07-blog-8-final-prediction/Screen Shot 2022-11-07 at 1.07.31 PM.png)
@@ -168,7 +173,7 @@ turnout_gg <-training_data_vote %>%
   geom_smooth(aes(x = turnout, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
   xlab("Turnout Percentage") +
   ylab("Party Vote Share") +
-  labs(title = "Party Vote Share vs. Voter Turnout Percentage") +
+  labs(title = "Voter Turnout Percentage") +
   scale_color_manual(name = "Regression",             # legend name
                      values = c("Democrats" = "blue",  # map regression line colors
                                 "Republicans" = "red")) +
@@ -182,7 +187,7 @@ turnout_gg <-training_data_vote %>%
   geom_smooth(aes(x = avg_rating, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
   xlab("Expert Rating Percentage") +
   ylab("Party Vote Share") +
-  labs(title = "Party Vote Share vs. Expert Rating") +
+  labs(title = "Expert Rating") +
   scale_color_manual(name = "Regression",             # legend name
                      values = c("Democrats" = "blue",  # map regression line colors
                                 "Republicans" = "red")) +
@@ -195,9 +200,9 @@ turnout_gg <-training_data_vote %>%
   geom_smooth(aes(x = dem_status, y = DemVotesMajorPercent, color = "Democrats"), method = "lm") + 
   geom_point(aes(x = rep_status, y = RepVotesMajorPercent)) + 
   geom_smooth(aes(x = rep_status, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
-  xlab("Presidential Party Incumbency Percentage") +
+  xlab("Democrat Presidential Incumbency Percentage") +
   ylab("Party Vote Share") +
-  labs(title = "Party Vote Share vs. Presidential Party Incumbency") +
+  labs(title = "Presidential Party Incumbency") +
   scale_color_manual(name = "Regression",             # legend name
                      values = c("Democrats" = "blue",  # map regression line colors
                                 "Republicans" = "red")) +
@@ -206,13 +211,13 @@ turnout_gg <-training_data_vote %>%
   
 genericballot_gg<-training_data_vote %>%
   ggplot() + 
-  geom_point(aes(x = gbavg_dem, y = DemVotesMajorPercent, color = "light blue", alpha = 0.5)) +
+  geom_point(aes(x = gbavg_dem, y = DemVotesMajorPercent)) +
   geom_smooth(aes(x = gbavg_dem, y = DemVotesMajorPercent, color = "Democrats"), method = "lm") + 
   geom_point(aes(x = gbavg_rep, y = RepVotesMajorPercent)) + 
   geom_smooth(aes(x = gbavg_rep, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
   xlab("Generic Ballot Averages") +
   ylab("Party Vote Share") +
-  labs(title = "Party Vote Share vs. Generic Ballot Averages") +
+  labs(title = "Generic Ballot Averages") +
   scale_color_manual(name = "Regression",             # legend name
                      values = c("Democrats" = "blue",  # map regression line colors
                                 "Republicans" = "red")) +
@@ -221,18 +226,16 @@ genericballot_gg<-training_data_vote %>%
 
 seatsup_gg <- training_data_vote %>%
   ggplot() + 
-  geom_point(aes(x = d_seats_up, y = DemVotesMajorPercent, color = "light blue", alpha = 0.3)) +
+  geom_point(aes(x = d_seats_up, y = DemVotesMajorPercent)) +
   geom_smooth(aes(x = d_seats_up, y = DemVotesMajorPercent, color = "Democrats"), method = "lm") + 
-  geom_point(aes(x = r_seats_up, y = RepVotesMajorPercent, color = "light red"), alpha = 0.3) + 
+  geom_point(aes(x = r_seats_up, y = RepVotesMajorPercent)) + 
   geom_smooth(aes(x = r_seats_up, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
   xlab("Current Seats Held by Party") +
   ylab("Party Vote Share") +
-  labs(title = "Party Vote Share vs. Generic Ballot Averages") +
+  labs(title = "Seats Held by Party") +
   scale_color_manual(name = "Regression",             # legend name
                      values = c("Democrats" = "blue",  # map regression line colors
-                                "Republicans" = "red",
-                                "light blue" = "light blue",
-                                "light red" = "salmon")) +
+                                "Republicans" = "red")) +
   theme_classic()
 
 grid.arrange(turnout_gg, expertrating_gg, dem_status_gg, genericballot_gg, seatsup_gg, nrow = 3, top=textGrob("Linear Regression of Party Vote Share vs. Predictors"))
@@ -274,87 +277,11 @@ As can be seen in the stargazer above, every variable is significant at the 99% 
 5. **Turnout**: In my model, the turnout variable has a coefficient of **-0.044**. This means that for every increase in one percent of turnout the democratic vote percentage decreases by -0.044 percent. While this coefficient does seem dubious given the small positive correlation between turnout and democratic vote share, in conjunction with the rest of my model perhaps turnout is being used to adjust vote percentage along with other variables. 
 
 
-```{r}
-##GRAPH INDEPENDENT VARIABLES RELATIONSHIP INDIVIDUALLY 
+# MODEL PREDICTION
 
-turnout_gg <-training_data_vote %>%
-  ggplot() + 
-  geom_point(aes(x = turnout, y = DemVotesMajorPercent)) +
-  geom_smooth(aes(x = turnout, y = DemVotesMajorPercent, color = "Democrats"), method = "lm") + 
-  geom_point(aes(x = turnout, y = RepVotesMajorPercent)) + 
-  geom_smooth(aes(x = turnout, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
-  xlab("Turnout Percentage") +
-  ylab("Party Vote Share") +
-  labs(title = "Linear Regression of Party Vote Share vs. Voter Turnout Percentage") +
-  scale_color_manual(name = "Regression",             # legend name
-                     values = c("Democrats" = "blue",  # map regression line colors
-                                "Republicans" = "red")) +
-  theme_classic()
- 
- expertrating_gg <-training_data_vote %>%
-  ggplot() + 
-  geom_point(aes(x = avg_rating, y = DemVotesMajorPercent)) +
-  geom_smooth(aes(x = avg_rating, y = DemVotesMajorPercent, color = "Democrats"), method = "lm") + 
-  geom_point(aes(x = avg_rating, y = RepVotesMajorPercent)) + 
-  geom_smooth(aes(x = avg_rating, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
-  xlab("Expert Rating Percentage") +
-  ylab("Party Vote Share") +
-  labs(title = "Linear Regression of Party Vote Share vs. Expert Rating") +
-  scale_color_manual(name = "Regression",             # legend name
-                     values = c("Democrats" = "blue",  # map regression line colors
-                                "Republicans" = "red")) +
-  theme_classic()
- 
- 
- dem_status_gg <-training_data_vote %>%
-  ggplot() + 
-  geom_point(aes(x = dem_status, y = DemVotesMajorPercent)) +
-  geom_smooth(aes(x = dem_status, y = DemVotesMajorPercent, color = "Democrats"), method = "lm") + 
-  geom_point(aes(x = rep_status, y = RepVotesMajorPercent)) + 
-  geom_smooth(aes(x = rep_status, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
-  xlab("Presidential Party Incumbency Percentage") +
-  ylab("Party Vote Share") +
-  labs(title = "Linear Regression of Party Vote Share vs. Presidential Party Incumbency") +
-  scale_color_manual(name = "Regression",             # legend name
-                     values = c("Democrats" = "blue",  # map regression line colors
-                                "Republicans" = "red")) +
-  theme_classic()
+Ultimately, the goal of creating the model is to then predict the outcome of tomorrow's 2022 midterm election in the house. As discussed earlier, I aim to predict two party vote share in the house. After wrangling the data for 2022 as of 11/07, **my model predicts that democrats will win approximately 46.84% of the two party vote share while Republicans will win 53.16% of the two party vote share for the house**. At a 95% confidence interval, my model's lower bound for democrat vote share percentage is approximately 41.2% while the upper bound is 52.49%. While this prediction may seem wide, it does seem on trend with the conversation going on in the election world even as of today. According to today's New York Times article, the election seems incredibly close and could swing either way despite a significantly easier path to House dominance by the Republican party. As such, I think this model's conclusion is fair and a likely outcome. However, to more formally analyze the validity of this model I used both in sample and out of sample metrics of evaluation. 
 
-  
-genericballot_gg<-training_data_vote %>%
-  ggplot() + 
-  geom_point(aes(x = gbavg_dem, y = DemVotesMajorPercent)) +
-  geom_smooth(aes(x = gbavg_dem, y = DemVotesMajorPercent, color = "Democrats"), method = "lm") + 
-  geom_point(aes(x = gbavg_rep, y = RepVotesMajorPercent)) + 
-  geom_smooth(aes(x = gbavg_rep, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
-  xlab("Generic Ballot Averages") +
-  ylab("Party Vote Share") +
-  labs(title = "Linear Regression of Party Vote Share vs. Generic Ballot Averages") +
-  scale_color_manual(name = "Regression",             # legend name
-                     values = c("Democrats" = "blue",  # map regression line colors
-                                "Republicans" = "red")) +
-  theme_classic()
-
-
-seatsup_gg <- training_data_vote %>%
-  ggplot() + 
-  geom_point(aes(x = d_seats_up, y = DemVotesMajorPercent, color = "blue2")) +
-  geom_smooth(aes(x = d_seats_up, y = DemVotesMajorPercent, color = "Democrats"), method = "lm") + 
-  geom_point(aes(x = r_seats_up, y = RepVotesMajorPercent, color = "red2")) + 
-  geom_smooth(aes(x = r_seats_up, y = RepVotesMajorPercent, color = "Republicans"), method = "lm") +
-  xlab("Current Seats Held by Party") +
-  ylab("Party Vote Share") +
-  labs(title = "Linear Regression of Party Vote Share vs. Generic Ballot Averages") +
-  scale_color_manual(name = "Regression",             # legend name
-                     values = c("Democrats" = "blue",  # map regression line colors
-                                "Republicans" = "red")) +
-  theme_classic()
-
-grid.arrange(turnout_gg, expertrating_gg, dem_status_gg, genericballot_gg, seatsup_gg, nrow = 3)
-```
-
-
-# MODEL PREDICTION 
+First off, looking at my model, it has an adjusted r-squared value of 0.761. While this is not a perfect r-squared, I do have confidence in the model's ability to predict off the data fairly well. In examining my models predictive capabilities, I graphed a plot of the models predictions on the training data against the actual values of Democratic vote share. As can be seen, the model looks very accurate for midterm years like 2014 and 2018, as well as 2020. The years where this model strayed from the data was in 2012 and 2016. I'm not surprised by the degree to which 2016 is off since my model is based significantly on polls and expert predictions, which proved incredibly fallible in the 2016 election. As such, I continue to have confidence in my models predictions and am encouraged by the models accuracy during midterm years in the data set. 
 
 ```{r}
 ## VOTE share Predictions
@@ -428,8 +355,7 @@ regressionprediction <-preddata %>%
 regressionprediction
 ```
 
-
-#TESTING
+Additionally, in evaluating the in-sample errors in the model I checked to make sure there wasn't any significant skew. Looking at a histogram of the residuals below, I can see that the errors are approximately normally distributed. Since normality of residuals is an assumption of a linear model, this proves the assumption valid for my national level model and gives me more confidence in my linear model predictions.
 
 ```{r}
 
@@ -442,7 +368,7 @@ modelr_2 <- summary(gbincludedseats)$r.squared
 hist(gbincludedseats$model$DemVotesMajorPercent -
 gbincludedseats$fitted.values,
 main="Histogram of Actual Dem Vote Share - Predicted Dem Vote Share",
-xlab = "Residual of Predictions")
+xlab = "Residual of Predictions", col = "blue")
 
 ##EVALUATE MSE
 
@@ -452,7 +378,6 @@ mseeval <- sqrt(mse_model)
 
 
 ```
-- errors are apporximately normally distributed. but sligtly left skewed 
 
 ```{r}
 #OUTSAMPLE MODEL 
@@ -466,6 +391,8 @@ training_data_vote[training_data_vote$year == 2018,])
 
                                                        
 ```
+
+In addition to conducting in-sample evaluation, I also conducted out of sample evaluation in order to evaluate my model and its sensitivity to given data points. Looking at cross validation error, my model had approximately 1.58124, which while not optimal is much  lower than many of my other previous models.
 
 ```{r}
 ##CROSS VALIDATION
@@ -487,19 +414,25 @@ crossvalerror <- mean(outsamp_pred - training_data_vote$DemVotesMajorPercent[tra
 
 #LIMITATIONS
 
+Overall, my largest limitation was definitely sample size. Statistics has shown time and time again that with small sample size comes increased bias and weaker models. House election data is very hard to find and even more so on a district level. My model got limited by the average expert predictions variable which didn't have data points before 2010. As such, my model didn't have enough elections to train on. This is one of the reasons I chose to use a national level model that aggregates district data into one prediction model rather than a district level model that contains an individual predictive model for each district and then aggregates each prediction, as each district only had 1-2 data points. Additionally, since my data predicts overall two party vote share, who actually controls the House and by how many seats could be different from dominance in my prediction. Without clear means for accounting for redistricting in my national level model, I felt efforts to tackle seat share predictions may not be sufficient or valuable. Overall, I'm proud of what I have put together but am incredibly cognizant that my models predictive power could be higher. 
+
+
 
 
 #CONCLUSION
 
+All in all, I'm eagerly awaiting election results and do believe my model has accurately predicted Republican dominance of the two party vote share. In reflecting on my model, I chose to present my national level prediction in its simplest form rather than one of my more technically advanced or flashy models made such as a pooled district model. Following the advice of Gary C. Jacobson, I chose to go for a simpler more robust model rather than a technical but data sparse model. I hope I made the right choice but looking at my final predictions of 46.84% for the Democratic Two Party Vote Share versus the 53.16% for Republicans, I feel fairly confident in the results. Ultimately, looking at the themes of this election, it feels as thought decisions are going to be made by reviewing sentiments towards the Democratic Party in the past two years instead of on a candidate by candidate or race by race basis. I look forward to evaluating this theory post election day and dissecting the psychological components and motivators behind the electoral outcome soon.
 
 
 #CITATIONS: 
-https://www.pewresearch.org/fact-tank/2022/11/03/key-facts-about-u-s-voter-priorities-ahead-of-the-2022-midterm-elections/
 
-https://www.presidency.ucsb.edu/analyses/the-2022-midterm-elections-what-the-historical-data-suggest
+Geoffreyvs. (2022, January 3). Why the president's party almost always has a bad midterm. FiveThirtyEight. Retrieved November 7, 2022, from https://fivethirtyeight.com/features/why-the-presidents-party-almost-always-has-a-bad-midterm/ 
 
-https://fivethirtyeight.com/features/why-the-presidents-party-almost-always-has-a-bad-midterm/
+Jacobson, Gary C. “ The 2022 U.S. Midterm Election: A Conventional Referendum or Something Different ?” Dropbox, University of California, San Diego, https://www.dropbox.com/s/95s7hip8bzg5x8n/Jacobson%202022%20Essay.pdf?dl=0. 
 
+Schaeffer, K., &amp; Green, T. V. (2022, November 3). Key facts about U.S. voter priorities ahead of the 2022 midterm elections. Pew Research Center. Retrieved November 7, 2022, from https://www.pewresearch.org/fact-tank/2022/11/03/key-facts-about-u-s-voter-priorities-ahead-of-the-2022-midterm-elections/ 
+
+“The 2022 Midterm Elections: What the Historical Data Suggest.: The American Presidency Project.” The 2022 Midterm Elections: What the Historical Data Suggest. | The American Presidency Project, 30 Aug. 2022, https://www.presidency.ucsb.edu/analyses/the-2022-midterm-elections-what-the-historical-data-suggest. 
 
 ```{r}
 #outsamp_errors <- sapply(1:1000, function(i){
