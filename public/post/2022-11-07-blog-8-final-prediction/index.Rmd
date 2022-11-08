@@ -127,7 +127,7 @@ seatshare <- training_data_vote %>%
                                   TRUE ~ 0))
 
 ```
-**TLDR; If you read nothing else, my model predicts that democrats will win approximately 46.8427% of the two party vote share while Republicans will win 53.16% of the two party vote share for the House midterm election in 2022.**
+**TLDR; If you read nothing else, my model predicts that democrats will win approximately 46.84% of the two party vote share while Republicans will win 53.16% of the two party vote share for the House midterm election in 2022.**
 
 Hi everyone! We’re back this week and ready for election day! This is the last stop on my election prediction journey and so I will take the time to synthesize my findings from the past 7 weeks to formally supply an estimation of the two party vote share outcome for the 2022 midterm elections. Today, I will walk you through every step of my process from variable consideration, to model evaluation, to prediction. I hope through reading this blog you will be able to understand how I've thought through the election and ways to make a robust model.
 
@@ -430,6 +430,92 @@ Jacobson, Gary C. “ The 2022 U.S. Midterm Election: A Conventional Referendum 
 Schaeffer, K., &amp; Green, T. V. (2022, November 3). Key facts about U.S. voter priorities ahead of the 2022 midterm elections. Pew Research Center. Retrieved November 7, 2022, from https://www.pewresearch.org/fact-tank/2022/11/03/key-facts-about-u-s-voter-priorities-ahead-of-the-2022-midterm-elections/ 
 
 “The 2022 Midterm Elections: What the Historical Data Suggest.: The American Presidency Project.” The 2022 Midterm Elections: What the Historical Data Suggest. | The American Presidency Project, 30 Aug. 2022, https://www.presidency.ucsb.edu/analyses/the-2022-midterm-elections-what-the-historical-data-suggest. 
+
+
+
+```{r}
+# DISTRICT LEVEL FOR DISTRICT COMPETITION PREDICTIONS ON SURVEY
+
+# # Joining the data and nesting by state and district
+# train_data_dem <- avg_ratings %>% 
+#   filter(year != 2022) %>% 
+#   # left join as there aren't ratings for every district
+#   left_join(dem_results, by = c("year", "state", "district")) %>% 
+#   group_by(state, district) %>% 
+#   filter(n() > 1) %>% # Filtering out single data rows
+#   group_nest() %>% 
+#   mutate(data = map(data, ~unnest(., cols = c())))
+# 
+# 
+# #run democrat and republican model on respective training dataset
+# modelsdem <- train_data_dem %>% 
+#   mutate(modeldem = map(data, ~lm(dem_votes_major_percent ~ avg_rating + dem_status, 
+#                                   data = .x))) %>%
+#   select(-data)
+# 
+# model_results_dem <- modelsdem %>% 
+#   mutate(r_squared = map_dbl(modeldem, ~summary(.x)$r.squared))
+# 
+# cvap_vp_df <- merge(dem_results_new, cvap_district, by = c('st_cd_fips', 'year'))
+# 
+# cvap_vp_rate_df <- cvap_vp_df %>%
+#   mutate(totalvotes = RepVotes + DemVotes,
+#          turnout = (totalvotes/cvap)*100) %>%
+#   rename(state_name = state.x, 
+#          district = cd) %>%
+#   left_join(avg_ratings_clean, by = c("state_name", "district", "year")) %>%
+#   filter(year != 2022) %>%
+#   drop_na()
+# 
+# cvap_extension_train <-  cvap_vp_rate_df %>%
+#   filter(year != 2022) %>% 
+#   group_by(st_cd_fips, state_name, cd_fips) %>%
+#   filter(n() > 1) %>% # Filtering out single data rows
+#   drop_na() %>%
+#   group_nest() %>% 
+#   mutate(data = map(data, ~unnest(., cols = c())))
+# 
+# #MAKE LINEAR MODEL
+# modelsdem <- cvap_extension_train %>% 
+#   mutate(modeldem = map(data, ~lm(DemVotesMajorPercent ~ turnout + avg_rating + dem_status, 
+#                                   data = .x))) %>%
+#   select(-data)
+# 
+# model_results_dem <- modelsdem %>% 
+#   mutate(r_squared = map_dbl(modeldem, ~summary(.x)$r.squared))
+# 
+# total_rsquared <- mean(model_results_dem$r_squared)
+# 
+# test_data <- avg_rate_test %>% 
+#    mutate(cd_fips = case_when(as.numeric(district) < 10 ~ paste0("0", district),
+#                                 TRUE ~ district)) %>%
+#   mutate(district = case_when(
+#     district == "AL" ~ "1",
+#     TRUE ~ district
+#   ))  %>%
+#   drop_na() %>%
+#   mutate(turnout = 47.57791, 
+#          avg_support_dem = 45.3,
+#          mavg_support_rep = 44.9, 
+#          dem_status = 1, 
+#          rep_status = 0) %>%
+#   group_by(state_name, cd_fips) %>% 
+#   group_nest() %>% 
+#   mutate(data = map(data, ~unnest(., cols = c())))
+# 
+# # Predicting district level linear model
+# pred_2022 <- test_data %>%
+#   # inner join as there may not be historical models for some districts
+#   inner_join(modelsdem, by = c("state_name", "cd_fips")) %>% 
+#   mutate(pred = map_dbl(.x = modeldem, .y = data, ~predict(object = .x, newdata = as.data.frame(.y)))) %>%
+#   select(state_name, cd_fips, pred)
+# 
+# pred_2022 %>% 
+#   mutate(total = case_when(pred > 0.5000000 ~ 1,
+#                            TRUE ~ 0)) %>%
+#   summarize(sum(total),
+#             n())
+```
 
 ```{r}
 #outsamp_errors <- sapply(1:1000, function(i){
