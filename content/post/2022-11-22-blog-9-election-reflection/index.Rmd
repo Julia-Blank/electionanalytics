@@ -58,8 +58,6 @@ From this formula, my election prediction was formulated finally on 11/7. My mod
 
 At the 95% confidence interval, the upper bound of my prediction for Democrat vote share percentage was approximately 52.49%, while the lower bound was approximately 41.2%. 
 
-With my
-
 **Accuracy Analysis**
 
 As of 11/28, the official outcome of the 2022 election was that Democrat's won 48.14% of the two-party vote share and Republican's won 51.86% of the two-party vote share. [(reported by david leap)]() The graph of the actual vote share outcome versus my predicted vote share outcome is illustrated below. 
@@ -215,9 +213,7 @@ This graph plots the model's predicted democratic vote share for a given year's 
 
 **HYPOTHESIZING SOURCES OF ERROR**
 
-Overall, I think this model showed me a few key limitations of a national-level fundamentals model. In this section, I will break the major flaws into three larger themes: my fundamentally focused model created a static view of a more complex and dynamic electoral race, my national-level model oversimplified district level and state-level nuance which had a larger role in this 2022 election due to state level issues like abortion being on the ballot, and more technically my model's data sparsity limited the set of data and biased it towards training on a pattern of ------. 
-
-
+Overall, I think this model showed me a few key limitations of a national-level fundamentals model. In this section, I will break the major flaws into three larger themes: my national-level model oversimplified district level and state-level nuance which had a larger role in this 2022 election due to state level issues like abortion being on the ballot, my fundamentally focused model didn't account for candidate quality and mutable electoral factors, and more technically my model's data sparsity limited the set of data and biased it towards overfitting on specific contemporary patterns. 
 
 
 **Hypothesis 1: The national level model failed to capture nuanced district, state, and regional nuance and variation that was especially dominant in this 2022 election** 
