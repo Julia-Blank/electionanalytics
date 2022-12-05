@@ -250,40 +250,16 @@ While a national level prediction has some benefits in its ability to avoid the 
 
 Additionally, I would want to overcome sample size issues that I had in this models train set. If I were to continue with a a national model, I would work much more aggressively ot either obtain expert prediction data for earlier elections or create simulated scores based on other election data from those years that I could find or imputing data from similar districts. That way I could overcome the sample size issue by going back more election years.
 
-If I were to convert to a district level model (which I think is the best recourse), I would definitely try to solve the sample size issue using similar tactics to 538's CANTOR which takes data from similar districts and imputes it into districts with data sparcity. For much more advanced research, I would also look to seeing if there are applications where I could possibly generate [synthetic data through simulation](https://bipartisanpolicy.org/blog/synthetic-data/) which has seen positive effects in the past. 
+If I were to convert to a district level model (which I think is the best recourse), I would definitely try to solve the sample size issue using similar tactics to FiveThirtyEights's CANTOR which takes data from similar districts and imputes it into districts with data sparsity. This would allow for significant increase in sample size and likely statistical validity.For much more advanced research, I would also look to seeing if there are applications where I could possibly generate [synthetic data through simulation](https://bipartisanpolicy.org/blog/synthetic-data/) which is a new technique that's caught the eye of the AI community. While this is a ways away from being ready, I think the field of election analytics could stand to benefit from the use of synthetic data since it's a field that has unique constraints on sample size. (warning: synthetic data currently doesn't allow for granularity that election analytics requires at the moment). Increasing the sample size will certainly help with the model's generalizability on new test sets which is ultimately how we can improve perfromance in new tests such as the next election. 
 
 **Citations**
 
-https://www.kff.org/other/press-release/analysis-reveals-how-abortion-boosted-democratic-candidates-in-tuesdays-midterm-election/
-https://www.sciencedirect.com/science/article/abs/pii/S0261379416304899
-https://www.politico.com/newsletters/politico-nightly/2022/09/13/the-gops-last-candidate-quality-test-00056533
-https://www.reuters.com/world/us/inflation-abortion-top-issues-us-voters-casting-midterm-ballots-exit-poll-finds-2022-11-08/
-https://fivethirtyeight.com/features/candidate-quality-mattered/
-https://www.washingtonpost.com/politics/2022/11/14/republican-popular-vote-seats/
-
-Regional Level Issue/national level model: 
-Hollistically, we can look at abortion's salience as a voting issue. To get a baseline of its importance to voters outside their candidate choice, we can look at voter registration after Dobbs. Then we can 
-
-
-**Hypothesis 1: Fundamentals Focused Model may have only allowed for a birds-eye view**
-
-In retrospect, looking at the predictors in my model illustrates a very overhead picture of the election. Many of the variables I've included like incumbency and democratic seats are one's that won't change the whole election. Other predictors, like national generic ballot and polling 
-
-FUNDEMANETALS FOCUSED MODEL:
-- didn't consider candidate quality
-- error with my model is that it contained a rather static view of the electoral race. this allowed it 
-- TEST THIS BY:
-- average score 
-
-https://www.politico.com/newsletters/politico-nightly/2022/09/13/the-gops-last-candidate-quality-test-00056533
-https://fivethirtyeight.com/features/candidate-quality-mattered/
-
-While I was a 
-- biggest focus would be on two themes: prioritizing more district level predictions and ammasing more data to train on. 
-- bias variance tradeoff; why i need to increase data 
-
-
-- too little data to train on and it learned patterns. 
-- going through historical examples
-- similar election profile to 2012
-- perhaps training on year with larger generic ballot gap?
+Ansolabehere, Stephen, and M. Socorro Puy. “Measuring Issue-Salience in Voters' Preferences.” Electoral Studies 51 (2018): 103–14. https://doi.org/10.1016/j.electstud.2017.09.008. 
+Blake, Aaron. “Analysis | Why the GOP's Popular-Vote Edge Hasn't Translated to More House Seats.” The Washington Post. WP Company, November 15, 2022. https://www.washingtonpost.com/politics/2022/11/14/republican-popular-vote-seats/. 
+Graefe, Andreas. Predicting elections: Experts, polls, and fundamentals. Accessed December 5, 2022. https://www.sas.upenn.edu/~baron/journal/18/18124/jdm18124.html. 
+Moskowitz, Seth. “The Key to Forecasting Midterms: The Generic Ballot.” Sabatos Crystal Ball. Accessed December 5, 2022. https://centerforpolitics.org/crystalball/articles/the-key-to-forecasting-midterms-the-generic-ballot/. 
+Oliphant, Baxter. “6. Quality and Responsiveness of Elected Officials.” Pew Research Center - U.S. Politics &amp; Policy. Pew Research Center, May 30, 2020. https://www.pewresearch.org/politics/2018/04/26/6-quality-and-responsiveness-of-elected-officials/. 
+Person. “Factbox: Inflation, Abortion Top Issues for U.S. Voters Casting Midterm Ballots, Exit Poll Finds.” Reuters. Thomson Reuters, November 8, 2022. https://www.reuters.com/world/us/inflation-abortion-top-issues-us-voters-casting-midterm-ballots-exit-poll-finds-2022-11-08/. 
+Published: Nov 11, 2022. “Analysis Reveals How Abortion Boosted Democratic Candidates in Tuesday's Midterm Election.” KFF, November 11, 2022. https://www.kff.org/other/press-release/analysis-reveals-how-abortion-boosted-democratic-candidates-in-tuesdays-midterm-election/. 
+Silver, Nate. “Candidate Quality Mattered.” FiveThirtyEight. FiveThirtyEight, November 9, 2022. https://fivethirtyeight.com/features/candidate-quality-mattered/. 
+Ward, Myah. “The GOP's Last 'Candidate Quality' Test.” POLITICO. Accessed December 5, 2022. https://www.politico.com/newsletters/politico-nightly/2022/09/13/the-gops-last-candidate-quality-test-00056533. 

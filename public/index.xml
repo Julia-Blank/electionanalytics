@@ -6,7 +6,18 @@
     <description>Recent content on Blank&#39;s Election Analytics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 07 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 22 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Blog 9: Election Reflection</title>
+      <link>http://example.org/post/2022-11-22-blog-9-election-reflection/</link>
+      <pubDate>Tue, 22 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://example.org/post/2022-11-22-blog-9-election-reflection/</guid>
+      <description>Hi everyone! Welcome back to the blog. Election day is finally over and now it’s time to analyze what worked and what didn’t in my prediction forecast. To see the original forecast look here at my last blog post, but no worries if you want the TLDR as I’ll provide a quick recap below.
+Model Recap
+My model was a national level model that aimed to predict Democratic Two Party Vote Share from 5 variables:</description>
+    </item>
+    
     <item>
       <title>Blog 8: Final Prediction</title>
       <link>http://example.org/post/2022-11-07-blog-8-final-prediction/</link>
