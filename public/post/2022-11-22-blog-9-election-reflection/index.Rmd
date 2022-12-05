@@ -244,16 +244,13 @@ To test the tendency for this model to over fit, I would like to compare accurac
 
 
 **IMPROVEMENTS**
-All in all, as you can see from the section of all
-- biggest focus would be on two themes: prioritizing more district level predictions and ammasing more data to train on. 
-- bias variance tradeoff; why i need to increase data 
+All in all, as you can see from the error hypothesis section, there are many things that may have gone wrong with my model. But, my biggest focus would be changing for two things: prioritizing district level data for district level predictions and amassing more data to train on. 
 
+While a national level prediction has some benefits in its ability to avoid the same data sparsity that often occurs with districts, I think a district level model helps capture some of the nuance that occurs with House elections. Especially in 2022, there are issues that have different salience in different regions as well as varying candidate quality. While a national level model allows for a generalization of partisan sentiments in the country, I don't think these are the most representative of how voters think on election day since voters are socialized in a local and regional context and not just by national media. As such, if I were to stick with a national model, I would definitely try using district level polls or a partisan lean index as a baseline of a districts partisanship instead of the national generic ballot which only captures partisan sentiment on aggregate. 
 
-- too little data to train on and it learned patterns. 
-- going through historical examples
-- similar election profile to 2012
-- perhaps training on year with larger generic ballot gap?
+Additionally, I would want to overcome sample size issues that I had in this models train set. If I were to continue with a a national model, I would work much more aggressively ot either obtain expert prediction data for earlier elections or create simulated scores based on other election data from those years that I could find or imputing data from similar districts. That way I could overcome the sample size issue by going back more election years.
 
+If I were to convert to a district level model (which I think is the best recourse), I would definitely try to solve the sample size issue using similar tactics to 538's CANTOR which takes data from similar districts and imputes it into districts with data sparcity. For much more advanced research, I would also look to seeing if there are applications where I could possibly generate [synthetic data through simulation](https://bipartisanpolicy.org/blog/synthetic-data/) which has seen positive effects in the past. 
 
 **Citations**
 
@@ -262,6 +259,7 @@ https://www.sciencedirect.com/science/article/abs/pii/S0261379416304899
 https://www.politico.com/newsletters/politico-nightly/2022/09/13/the-gops-last-candidate-quality-test-00056533
 https://www.reuters.com/world/us/inflation-abortion-top-issues-us-voters-casting-midterm-ballots-exit-poll-finds-2022-11-08/
 https://fivethirtyeight.com/features/candidate-quality-mattered/
+https://www.washingtonpost.com/politics/2022/11/14/republican-popular-vote-seats/
 
 Regional Level Issue/national level model: 
 Hollistically, we can look at abortion's salience as a voting issue. To get a baseline of its importance to voters outside their candidate choice, we can look at voter registration after Dobbs. Then we can 
@@ -279,3 +277,13 @@ FUNDEMANETALS FOCUSED MODEL:
 
 https://www.politico.com/newsletters/politico-nightly/2022/09/13/the-gops-last-candidate-quality-test-00056533
 https://fivethirtyeight.com/features/candidate-quality-mattered/
+
+While I was a 
+- biggest focus would be on two themes: prioritizing more district level predictions and ammasing more data to train on. 
+- bias variance tradeoff; why i need to increase data 
+
+
+- too little data to train on and it learned patterns. 
+- going through historical examples
+- similar election profile to 2012
+- perhaps training on year with larger generic ballot gap?

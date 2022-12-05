@@ -102,21 +102,17 @@
 <p>Finally, and perhaps the most statistically concerning element of my model, was how few elections and data points the model trained on. The model only had election years of 2012-2020 to train on due to a limitation of how far back I could obtain accurate expert predictions. However, training on such few elections has the main drawback of preventing my model from being generalizable as it likely picked up on trends from the previous few elections rather than the majority of election ran in the US. Looking at the data it trained on, I’m not surprised that the model overvalued the fundamentals and incumbent party’s advantage. The model notably best fit data from the years 2014, 2018 which had elections with major swings from the presidential incumbent and a strong national sentiment consistent across all demographics. With this being where my model performed best, I believe my model may have over fit and thus over-weight the negative effects on the incumbent party.</p>
 <p>To test the tendency for this model to over fit, I would like to compare accuracy of the model on it’s train set versus accuracy on a validation or test set of data. Since my model does have a small sample size, I could pick any election year outside of the train data and test the model’s performance on this set of data. While empirically there isn’t a cut off for what is “over fit”, seeing a high reduction in accuracy in the validation or test set would illustrate an over fit model.</p>
 <p><strong>IMPROVEMENTS</strong>
-All in all, as you can see from the section of all
-- biggest focus would be on two themes: prioritizing more district level predictions and ammasing more data to train on.
-- bias variance tradeoff; why i need to increase data</p>
-<ul>
-<li>too little data to train on and it learned patterns.</li>
-<li>going through historical examples</li>
-<li>similar election profile to 2012</li>
-<li>perhaps training on year with larger generic ballot gap?</li>
-</ul>
+All in all, as you can see from the error hypothesis section, there are many things that may have gone wrong with my model. But, my biggest focus would be changing for two things: prioritizing district level data for district level predictions and amassing more data to train on.</p>
+<p>While a national level prediction has some benefits in its ability to avoid the same data sparsity that often occurs with districts, I think a district level model helps capture some of the nuance that occurs with House elections. Especially in 2022, there are issues that have different salience in different regions as well as varying candidate quality. While a national level model allows for a generalization of partisan sentiments in the country, I don’t think these are the most representative of how voters think on election day since voters are socialized in a local and regional context and not just by national media. As such, if I were to stick with a national model, I would definitely try using district level polls or a partisan lean index as a baseline of a districts partisanship instead of the national generic ballot which only captures partisan sentiment on aggregate.</p>
+<p>Additionally, I would want to overcome sample size issues that I had in this models train set. If I were to continue with a a national model, I would work much more aggressively ot either obtain expert prediction data for earlier elections or create simulated scores based on other election data from those years that I could find or imputing data from similar districts. That way I could overcome the sample size issue by going back more election years.</p>
+<p>If I were to convert to a district level model (which I think is the best recourse), I would definitely try to solve the sample size issue using similar tactics to 538’s CANTOR which takes data from similar districts and imputes it into districts with data sparcity. For much more advanced research, I would also look to seeing if there are applications where I could possibly generate <a href="https://bipartisanpolicy.org/blog/synthetic-data/">synthetic data through simulation</a> which has seen positive effects in the past.</p>
 <p><strong>Citations</strong></p>
 <p><a href="https://www.kff.org/other/press-release/analysis-reveals-how-abortion-boosted-democratic-candidates-in-tuesdays-midterm-election/" class="uri">https://www.kff.org/other/press-release/analysis-reveals-how-abortion-boosted-democratic-candidates-in-tuesdays-midterm-election/</a>
 <a href="https://www.sciencedirect.com/science/article/abs/pii/S0261379416304899" class="uri">https://www.sciencedirect.com/science/article/abs/pii/S0261379416304899</a>
 <a href="https://www.politico.com/newsletters/politico-nightly/2022/09/13/the-gops-last-candidate-quality-test-00056533" class="uri">https://www.politico.com/newsletters/politico-nightly/2022/09/13/the-gops-last-candidate-quality-test-00056533</a>
 <a href="https://www.reuters.com/world/us/inflation-abortion-top-issues-us-voters-casting-midterm-ballots-exit-poll-finds-2022-11-08/" class="uri">https://www.reuters.com/world/us/inflation-abortion-top-issues-us-voters-casting-midterm-ballots-exit-poll-finds-2022-11-08/</a>
-<a href="https://fivethirtyeight.com/features/candidate-quality-mattered/" class="uri">https://fivethirtyeight.com/features/candidate-quality-mattered/</a></p>
+<a href="https://fivethirtyeight.com/features/candidate-quality-mattered/" class="uri">https://fivethirtyeight.com/features/candidate-quality-mattered/</a>
+<a href="https://www.washingtonpost.com/politics/2022/11/14/republican-popular-vote-seats/" class="uri">https://www.washingtonpost.com/politics/2022/11/14/republican-popular-vote-seats/</a></p>
 <p>Regional Level Issue/national level model:
 Hollistically, we can look at abortion’s salience as a voting issue. To get a baseline of its importance to voters outside their candidate choice, we can look at voter registration after Dobbs. Then we can</p>
 <p><strong>Hypothesis 1: Fundamentals Focused Model may have only allowed for a birds-eye view</strong></p>
@@ -128,6 +124,15 @@ Hollistically, we can look at abortion’s salience as a voting issue. To get a 
 - average score</p>
 <p><a href="https://www.politico.com/newsletters/politico-nightly/2022/09/13/the-gops-last-candidate-quality-test-00056533" class="uri">https://www.politico.com/newsletters/politico-nightly/2022/09/13/the-gops-last-candidate-quality-test-00056533</a>
 <a href="https://fivethirtyeight.com/features/candidate-quality-mattered/" class="uri">https://fivethirtyeight.com/features/candidate-quality-mattered/</a></p>
+<p>While I was a
+- biggest focus would be on two themes: prioritizing more district level predictions and ammasing more data to train on.
+- bias variance tradeoff; why i need to increase data</p>
+<ul>
+<li>too little data to train on and it learned patterns.</li>
+<li>going through historical examples</li>
+<li>similar election profile to 2012</li>
+<li>perhaps training on year with larger generic ballot gap?</li>
+</ul>
 
 
 		
@@ -144,7 +149,7 @@ Hollistically, we can look at abortion’s salience as a voting issue. To get a 
         		<footer>
 			
 			<span>
-			&copy; <time datetime="2022-12-05 11:32:04.27307 -0500 EST m=&#43;0.211676282">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2022-12-05 11:58:47.576136 -0500 EST m=&#43;0.237925236">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
