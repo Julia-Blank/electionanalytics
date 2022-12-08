@@ -19,6 +19,7 @@ Going into the 2022 election, the district seemed to have a Republican partisan 
 
 
 **THE CANDIDATES** 
+
 The 2022 general election for the House of Representative's in Pennsylvania District 8 was between Democratic Incumbent Matt Cartwright and Republican Challenger Jim Bognet. The 2022 general election was in fact a rematch of the 2020 election between these same two candidates. As such, in the Republican primary, Jim Bognet, the Trump-backed candidate, defeated Mike Marsciano with ease and a 37.4 point lead. 
 
 To dive in a little deeper, Representative Matt Cartwright is a Democrat who's served in the House since election in 2012. He originally served in Pennsylvania's 17th district until 2019 but then was redistricted to the 8th district in 2020. Cartwright received his J.D. from the University of Pennsylvania and served as a lawyer for 25 years before going into public service. In 2012, he ran his first campaign to win a term in the House of Representatives. Since 2013, Cartwright is seen as a very moderate Democrat and has a reputation for working on bipartisan legislation. He's served on the House Appropriations Committee and has introduced more bills with Democratic and Republican sepport than any other House Democrat since he was elected. 
@@ -27,8 +28,7 @@ His challenger, Republican Jim Bognet has worked around government for a while. 
 
 With the background picture painted, it is clear that Pennsylvania's District 8 was a contentious house election where predominantly white, rural voters were presented the choice between two candidates for the second time: Cartwright, the bipartisan Democrat of the status quo, or Bognet, a Trump Republican protesting against the actions of the Biden administration. 
 
-**THE CAMPAIGN**  Drawing on the news you have been following and other sources if necessary, briefly summarize the campaign in the district.  For example, you might consider the candidates and issues of “candidate quality” and the volume and content of their campaign, including the air and ground campaign, and the associated news coverage.  Particular examples can be useful here. Be sure to cite your sources.
-
+**THE CAMPAIGN**
 
 Historically, people have said that Pennsylvania is a microcosm of the country and fascinatingly enough I'd contend that this district serves as a microcosm of Pennsylvania. Much like the over-arching national narrative of the midterms, this election was between moderate, incumbent Democrat Cartwright and a Republican challenger lamenting the status quo of Biden's Administration and poor economic conditions. 
 
@@ -102,6 +102,7 @@ As can be seen in the image above, Pennsylvania 8 swung more democratic than exp
 
 
 **Conclusion**
+
 To start, Cartwright ran a phenomenal campaign that removed ideology and embraced the partisan dissonance of his region. Truthfully, his campaign along with his quality as a candidate allowed him to outperform dismal fundamentals for his party. While Cartwright was an incumbent democrat, his campaign emphasized bipartisanship so much that I hypothesize it nearly dissociated him from blame for the poor economic situation under Biden's Democrat lead government. Strategically, Cartwright also visually demonstrated that one could hold Trumpian views and also vote for him. In a campaign ad, a [Cartwright supporter urges voters](https://theintercept.com/2022/10/28/deconstructed-pennsylvania-cartwright-bognet/) to vote Cartwright while wearing a MAGA hat. This messaging transcends traditional party politics that Republican Bognet was counting on and hoping to engage with to seize the election. This campaign strategy diverged significantly from the national Democratic party messaging which emphasized progressive social values and attempted to motivate voters through calls to action against the warring ideology of the Republican party. I posit that the difference in strategy lies in the purpose of campaigning. In most races, the campaign is about motivating turnout and not about persuading voters to support one candidate or party. (Kalla and Broockman (2018)) (Enos and Fowler (2016)). Uniquely, however, in PA-08 the similar legislative priorities of both candidates and bipartisan nature of the district makes it plausible that many voters would in fact vote for either candidate and so campaigning likely had a rare actual impact on voter preference. 
 
 As such, while I have yet to test this hypothesis, I do believe that this may lead to the small amounts of forecasting error we see among expert predictions. Due to traditional theory like Kalla and Broockman, I believe most models choose to relatively exclude campaigning efforts and messaging from their models except in cases of forecasting turnout. However, Pennsylvania 8 has an unorthodox set of voters and electoral history that has proven time and time again voters are comfortable with candidates that pose favorable policies for the region like the case in 2016 and 2020 where they elect to have a Democrat Representative and Trump as President. A model that is not trained to look for persuasive effects of campaigns may in fact display error of the slight but significant margins seen with this years forecasts. 
@@ -112,20 +113,31 @@ Thank you so much for reading my election blog this semester. I've loved getting
 
 CITATIONS:
 
-https://censusreporter.org/profiles/50000US4208-congressional-district-8-pa/
-https://ballotpedia.org/Pennsylvania%27s_8th_Congressional_District_election,_2022
-https://ballotpedia.org/Pennsylvania%27s_8th_Congressional_District
-https://www.opensecrets.org/races/summary?cycle=2022&id=PA08&spec=N
-https://www.businessinsider.com/results-matt-cartwright-jim-bognet-pennsylvania-8th-district-house-election-2022-11
-https://www.nytimes.com/interactive/2022/11/08/us/elections/results-pennsylvania-us-house-district-8.html
-https://www.opensecrets.org/news/2022/11/spend-big-win-big-96-of-u-s-house-races-won-by-the-biggest-spender/
-https://www.yahoo.com/video/fact-check-house-majority-pac-072900976.html?guccounter=1&guce_referrer=aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS8&guce_referrer_sig=AQAAAKefvEjvMC0ulA7U24ZU5AdZVfUF7f6CiKoa1PD9xHoMFqD52ErkRUFIc8u1wOVWJG2yKKWNE9MUIt65v3zH3ySYYR5TsNxlPzOJ5VBGcyI3jVAv1L2GHMA_MQdUJWnBnxkRfvmVNk9BvJpm5qFDoOrJgDTFMDsqmSpBctVUt_2k
-https://www.economist.com/interactive/us-midterms-2022/forecast/house/pennsylvania#8
-https://projects.fivethirtyeight.com/2022-election-forecast/house/pennsylvania/8/
+“Census Profile: Congressional District 8, PA.” Census Reporter. Accessed December 8, 2022. https://censusreporter.org/profiles/50000US4208-congressional-district-8-pa/. 
 
-Ryan D. Enos and Anthony Fowler. Aggregate effects of large-scale campaigns on voter
-turnout. Political Science Research and Methods, 6(4):733–751, 2016. URL.
+“The Economist's 2022 House Forecast.” The Economist. The Economist Newspaper. Accessed December 8, 2022. https://www.economist.com/interactive/us-midterms-2022/forecast/house/pennsylvania#8. 
 
-Joshua L Kalla and David E Broockman. The minimal persuasive effects of campaign contact
-in general elections: Evidence from 49 field experiments. American Political Science
-Review, 112(1):148–166, 2018.
+Enos, Ryan D., and Anthony Fowler. “Aggregate Effects of Large-Scale Campaigns on Voter Turnout.” Political Science Research and Methods 6, no. 4 (2016): 733–51. https://doi.org/10.1017/psrm.2016.21. 
+
+“Fact-Check of House Majority Pac Ad Criticizing Republican Congressional Candidate Jim Bognet.” Yahoo! Yahoo! Accessed December 8, 2022. https://www.yahoo.com/video/fact-check-house-majority-pac-072900976.html?guccounter=1&amp;guce_referrer=aHR0cHM6Ly93d3cuZ29vZ2xlLmNvbS8&amp;guce_referrer_sig=AQAAAKefvEjvMC0ulA7U24ZU5AdZVfUF7f6CiKoa1PD9xHoMFqD52ErkRUFIc8u1wOVWJG2yKKWNE9MUIt65v3zH3ySYYR5TsNxlPzOJ5VBGcyI3jVAv1L2GHMA_MQdUJWnBnxkRfvmVNk9BvJpm5qFDoOrJgDTFMDsqmSpBctVUt_2k. 
+
+KALLA, JOSHUA L., and DAVID E. BROOCKMAN. “The Minimal Persuasive Effects of Campaign Contact in General Elections: Evidence from 49 Field Experiments.” American Political Science Review 112, no. 1 (2017): 148–66. https://doi.org/10.1017/s0003055417000363. 
+
+Kang, Hanna. “Results: Democratic Rep. Matt Cartwright Defeats Trump-Endorsed Republican Jim Bognet in Pennsylvania's 8th Congressional District Election.” Business Insider. Business Insider. Accessed December 8, 2022.https://www.businessinsider.com/results-matt-cartwright-jim-bognet-pennsylvania-8th-district-house-election-2022-11. 
+
+Oliphant, Baxter. “6. Quality and Responsiveness of Elected Officials.” Pew Research Center - U.S. Politics &amp; Policy. Pew Research Center, May 30, 2020. https://www.pewresearch.org/politics/2018/04/26/6-quality-and-responsiveness-of-elected-officials/. 
+“Pennsylvania District 08 2022 Race.” OpenSecrets. Accessed December 8, 2022. https://www.opensecrets.org/races/summary?cycle=2022&amp;id=PA08&amp;spec=N. 
+
+“Pennsylvania Eighth Congressional District Election Results.” The New York Times. The New York Times, November 8, 2022. https://www.nytimes.com/interactive/2022/11/08/us/elections/results-pennsylvania-us-house-district-8.html. 
+
+“Pennsylvania's 8th Congressional District Election, 2022.” Ballotpedia. Accessed December 8, 2022. https://ballotpedia.org/Pennsylvania%27s_8th_Congressional_District_election,_2022. 
+
+“Pennsylvania's 8th Congressional District.” Ballotpedia. Accessed December 8, 2022. https://ballotpedia.org/Pennsylvania%27s_8th_Congressional_District. 
+
+Silver, Nate. “2022 House Forecast.” FiveThirtyEight, November 8, 2022. https://projects.fivethirtyeight.com/2022-election-forecast/house/pennsylvania/8/. 
+
+“Spend Big, WIN BIG: 96% of U.S. House Races Won by the Biggest Spender.” OpenSecrets News, November 10, 2022. https://www.opensecrets.org/news/2022/11/spend-big-win-big-96-of-u-s-house-races-won-by-the-biggest-spender/. 
+
+Vavreck, Lynn. The Message Matters the Economy and Presidential Campaigns. Princeton (N.J.): Princeton University Press, 2009. 
+
+Ward, Myah. “The GOP's Last 'Candidate Quality' Test.” POLITICO. Accessed December 5, 2022. https://www.politico.com/newsletters/politico-nightly/2022/09/13/the-gops-last-candidate-quality-test-00056533. 
