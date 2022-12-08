@@ -6,7 +6,18 @@
     <description>Recent content on Blank&#39;s Election Analytics</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 22 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 07 Dec 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Blog 10: The Campaign Narrative</title>
+      <link>http://example.org/post/2022-12-07-blog-10-the-campaign-narrative/</link>
+      <pubDate>Wed, 07 Dec 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://example.org/post/2022-12-07-blog-10-the-campaign-narrative/</guid>
+      <description>Hi everyone! Welcome back to the blog! While I’ve spent the past 9 weeks focusing on how to predict elections and analyze forecasts, this week we’ve decided to culminate our studies with a case study: Pennsylvania District 8. Since analyzing numbers and regressions in the abstract oftentimes feels so removed from having consequence on anything meaningful in our political system, I’m hoping to contextualize our wor.
+DISTRICT OVERVIEW:
+THE VOTERS: Pennsylvania District 8 lies in the North Eastern section of the state.</description>
+    </item>
+    
     <item>
       <title>Blog 9: Election Reflection</title>
       <link>http://example.org/post/2022-11-22-blog-9-election-reflection/</link>

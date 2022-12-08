@@ -7,11 +7,10 @@ categories: []
 tags: []
 ---
 
-Hi everyone! Welcome back to the blog! While I've spent the past 9 weeks focusing on how to predict elections and analyze forecasts, this week we've decided to culminate our studies with a case study: Pennsylvania District 8. Since analyzing numbers and regressions in the abstract oftentimes feels so removed from having consequence on anything meaningful in our political system, I'm hoping to contextualize our wor. 
+Hi everyone! Welcome back to the blog! While I've spent the past 9 weeks focusing on how to predict elections and analyze forecasts, this week we've decided to culminate our studies with a case study: Pennsylvania District 8. Since analyzing numbers and regressions in the abstract oftentimes feels so removed from having consequence on anything meaningful in our political system, I'm hoping to contextualize our work. 
 
-**DISTRICT OVERVIEW**: 
+**DISTRICT OVERVIEW**
 
-**THE VOTERS**:
 Pennsylvania District 8 lies in the North Eastern section of the state. It's comprised of parts of 5 counties: Lackawanna County, Monroe County, Luzerne County, Pike County, and Wayne County. Notably in the 2020 redistricting, parts of Monroe county were added to the district causing a reduction of the Republican lean of the district. The district contains 713,086 people with 78% of them White, 6.5% Black, 2% Asian, and is ethnically 12.8% Hispanic. With a median household income of $56,739 and a college graduation rate of 25.2%, Pennsylvania 8 seems to be a mostly white, working class district. Additionally, 6.9% of the population in the district are veterans (10% higher than Pennsylvania and US average) with an outsized portion of them being those who fought in Vietnam. 
 
 In terms of it's partisanship, Pennsylvania District 8 is one of the infamous "Pivot Counties". These are counties that voted for Barack Obama in 2008 and 2012 but shifted to vote for Donald Trump in 2016. Additionally, in 2020 this county also voted for Trump while putting in a Democratic Representative in the House. Taking a look at Pennsylvania District 8's electoral history, the district appears to be a continual toss-up for the House in recent years and since 2016 has entered a unique phase of its electoral makeup. From 2006-2010 they had Democratic Representative, and then from 2010-2018 had a republican representative. In 2018, Democrat Matt Cartwright was elected and has remained as the House Representative since. 
